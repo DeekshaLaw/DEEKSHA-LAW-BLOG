@@ -26,9 +26,12 @@ const AdminDashboard = () => {
         
         // Build query params
         const params = {};
-        if (filters.status) params.status = filters.status;
+        // Important: Include status even if it's empty string - this means "All Statuses"
+        params.status = filters.status;
         if (filters.category) params.category = filters.category;
         if (filters.author) params.author = filters.author;
+        
+        console.log('Requesting blogs with params:', JSON.stringify(params));
         
         // Get token from localStorage
         const token = localStorage.getItem('token');
@@ -108,9 +111,14 @@ const AdminDashboard = () => {
   }, []); // Empty dependency array so it only runs once on mount
   
   const handleFilterChange = (e) => {
+    const newValue = e.target.value;
+    const fieldName = e.target.name;
+    
+    console.log(`Filter changed: ${fieldName} = "${newValue}" (type: ${typeof newValue})`);
+    
     setFilters({
       ...filters,
-      [e.target.name]: e.target.value
+      [fieldName]: newValue
     });
   };
   
@@ -349,6 +357,15 @@ const AdminDashboard = () => {
                                 'Loading...' : 'Reject'}
                             </button>
                           )}
+                          
+                          <Link 
+                            to={`/blogs/${blog._id}`} 
+                            className="btn btn-sm btn-info me-1"
+                            target="_blank"
+                            state={{ adminPreview: true }}
+                          >
+                            <i className="bi bi-eye"></i> View
+                          </Link>
                           
                           <Link 
                             to={`/blogs/edit/${blog._id}`} 

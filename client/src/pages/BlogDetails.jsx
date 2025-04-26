@@ -1,12 +1,16 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 
 const BlogDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated, user } = useContext(AuthContext);
+  
+  // Check if this is an admin preview
+  const isAdminPreview = location.state?.adminPreview && user?.role === 'admin';
   
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,18 +25,41 @@ const BlogDetails = () => {
         setLoading(true);
         setError('');
         
-        const res = await axios.get(`/blogs/${id}`);
+        // Get token from localStorage for authorization
+        const token = localStorage.getItem('token');
+        console.log('Token available:', !!token);
+        console.log('User role:', user?.role);
+        console.log('Is admin preview?', location.state?.adminPreview);
+        
+        // Include special admin flag when admin is previewing
+        const headers = {
+          Authorization: token ? `Bearer ${token}` : ''
+        };
+        
+        // If this is an admin preview, set special query parameter
+        let url = `/blogs/${id}`;
+        if (user?.role === 'admin' && location.state?.adminPreview) {
+          url += '?admin_preview=true';
+          console.log('Adding admin_preview parameter to URL');
+        }
+        
+        console.log('Making request to:', url);
+        const res = await axios.get(url, { headers });
+        console.log('Response received:', res.status);
         setBlog(res.data.data);
       } catch (err) {
+        console.error('Blog fetch error details:', err);
         setError('Blog not found or you do not have permission to view it.');
-        console.error(err);
       } finally {
         setLoading(false);
       }
     };
     
-    fetchBlog();
-  }, [id]);
+    // Only attempt to fetch if the user data is available for admin preview
+    if (!location.state?.adminPreview || (location.state?.adminPreview && user)) {
+      fetchBlog();
+    }
+  }, [id, user, location.state]);
   
   const handleLike = async () => {
     if (!isAuthenticated) {
@@ -104,6 +131,19 @@ const BlogDetails = () => {
       <div className="container py-5">
         <div className="alert alert-danger" role="alert">
           {error}
+          {location.state?.adminPreview && (
+            <div className="mt-2">
+              <p>
+                <strong>Admin Note:</strong> Make sure you are logged in as an admin to preview pending blogs.
+              </p>
+              <button 
+                className="btn btn-secondary btn-sm"
+                onClick={() => window.close()}
+              >
+                Close Preview
+              </button>
+            </div>
+          )}
         </div>
         <button 
           className="btn btn-primary"
@@ -127,6 +167,21 @@ const BlogDetails = () => {
     <div className="container py-5">
       <div className="row">
         <div className="col-lg-8 mx-auto">
+          {/* Admin Preview Banner */}
+          {isAdminPreview && blog?.status !== 'approved' && (
+            <div className={`alert ${blog?.status === 'pending' ? 'alert-warning' : 'alert-danger'} mb-4`}>
+              <strong>Admin Preview Mode:</strong> You are viewing this {blog?.status} blog as an administrator. 
+              <div className="mt-2">
+                <button 
+                  className="btn btn-sm btn-secondary"
+                  onClick={() => window.close()}
+                >
+                  Close Preview
+                </button>
+              </div>
+            </div>
+          )}
+          
           {/* Blog header */}
           <h1 className="mb-3">{blog.title}</h1>
           <p className="text-muted">
@@ -136,6 +191,14 @@ const BlogDetails = () => {
             <span className="ms-3">
               {new Date(blog.createdAt).toLocaleDateString()}
             </span>
+            {isAdminPreview && (
+              <span className={`ms-2 badge ${
+                blog.status === 'approved' ? 'bg-success' : 
+                blog.status === 'pending' ? 'bg-warning' : 'bg-danger'
+              }`}>
+                {blog.status}
+              </span>
+            )}
           </p>
           
           {/* Featured image */}

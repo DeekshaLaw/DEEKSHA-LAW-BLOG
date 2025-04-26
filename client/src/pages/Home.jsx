@@ -15,10 +15,16 @@ const Home = () => {
         setLoading(true);
         setError('');
         
-        // Fetch blogs (only approved will be returned for public)
-        const blogsRes = await axios.get('/blogs', {
-          params: selectedCategory ? { category: selectedCategory } : {}
-        });
+        // Fetch blogs (explicitly request only approved blogs)
+        const params = { status: 'approved' };
+        
+        // Add category filter if selected
+        if (selectedCategory) {
+          params.category = selectedCategory;
+        }
+        
+        // Make API request with status=approved parameter
+        const blogsRes = await axios.get('/blogs', { params });
         
         // Fetch categories
         const categoriesRes = await axios.get('/categories');

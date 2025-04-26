@@ -32,7 +32,20 @@ router.get('/', (req, res, next) => {
   });
 }, getBlogs);
 
-router.get('/:id', getBlog);
+router.get('/:id', (req, res, next) => {
+  // Continue even if not logged in
+  if (!req.headers.authorization) {
+    return next();
+  }
+  
+  // Try to authenticate but continue either way
+  protect(req, res, (err) => {
+    if (err) {
+      console.error('Auth error but continuing:', err);
+    }
+    next();
+  });
+}, getBlog);
 
 // Protected routes
 router.use(protect);

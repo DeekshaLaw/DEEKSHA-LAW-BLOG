@@ -70,11 +70,18 @@ exports.getBlogs = async (req, res) => {
       query.status = 'approved';
     } else {
       console.log('Admin user, showing all blogs or filtering by status');
-      // For admin users, if no status filter provided, show all blogs including pending ones
-      // Only apply status filter if explicitly provided in query params
+      // For admin users, if status filter is provided and not empty, use it
       if (req.query.status) {
         console.log(`Admin filtered by status: ${req.query.status}`);
         query.status = req.query.status;
+      } else if (req.query.status === '') {
+        // Empty string means "All Statuses" was selected - don't filter by status
+        console.log('Admin selected "All Statuses" - showing all status types');
+        // No status filter added to query, so all statuses will be included
+      } else {
+        // If status parameter is not present (default case), show approved blogs
+        query.status = 'approved';
+        console.log('Admin without status parameter - defaulting to approved blogs');
       }
     }
     
@@ -117,37 +124,65 @@ exports.getBlogs = async (req, res) => {
 // @access  Public/Private
 exports.getBlog = async (req, res) => {
   try {
+    console.log('Get blog request received for id:', req.params.id);
+    console.log('User data:', req.user ? {
+      id: req.user.id,
+      name: req.user.name,
+      role: req.user.role
+    } : 'Not authenticated');
+    console.log('Query parameters:', req.query);
+    
     const blog = await Blog.findById(req.params.id)
       .populate('category', 'name')
       .populate('author', 'name')
       .populate('comments.user', 'name');
     
     if (!blog) {
+      console.log('Blog not found');
       return res.status(404).json({
         success: false,
         message: 'Blog not found'
       });
     }
     
-    // Check if blog is approved or if user is owner or admin
-    if (
-      blog.status !== 'approved' && 
-      (!req.user || 
-        (req.user.role !== 'admin' && 
-         blog.author._id.toString() !== req.user.id)
-      )
-    ) {
+    console.log('Blog found. Status:', blog.status);
+    
+    // Admin preview check (more robust version)
+    let isAdminPreview = false;
+    
+    // Check for admin preview query parameter and admin user
+    if (req.query.admin_preview === 'true') {
+      if (req.user && req.user.role === 'admin') {
+        console.log('✅ Valid admin preview mode detected');
+        isAdminPreview = true;
+      } else {
+        console.log('❌ Admin preview requested but user is not admin');
+      }
+    }
+    
+    // Authorization check
+    const isAdmin = req.user && req.user.role === 'admin';
+    const isAuthor = req.user && blog.author._id.toString() === req.user.id;
+    const isApproved = blog.status === 'approved';
+    
+    console.log('Auth checks:', { isAdmin, isAuthor, isApproved, isAdminPreview });
+    
+    // Skip the status check if admin is previewing or other authorized access
+    if (!isApproved && !isAdmin && !isAuthor && !isAdminPreview) {
+      console.log('Access denied: User not authorized');
       return res.status(403).json({
         success: false,
         message: 'Not authorized to access this blog'
       });
     }
     
+    console.log('Access granted, sending blog data');
     res.status(200).json({
       success: true,
       data: blog
     });
   } catch (err) {
+    console.error('Error in getBlog:', err);
     res.status(500).json({
       success: false,
       message: err.message
