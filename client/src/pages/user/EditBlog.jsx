@@ -94,16 +94,16 @@ const EditBlog = () => {
     }
     
     // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
-      setImageError('Only .jpg, .jpeg, and .png files are allowed.');
+      setImageError('Only .jpg, .jpeg, webp and .png files are allowed.');
       return;
     }
     
-    // Validate file size (minimum 2MB)
-    const minSize = 2 * 1024 * 1024; // 2MB in bytes
-    if (file.size < minSize) {
-      setImageError('Image must be at least 2MB in size.');
+    // Validate file size (maximum 2MB)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > maxSize) {
+      setImageError('Image must be less than 2MB in size.');
       return;
     }
     
@@ -236,7 +236,7 @@ const EditBlog = () => {
         
         <div className="mb-3">
           <label htmlFor="featuredImage" className="form-label">
-            Featured Image (Optional, min 2MB, .jpg, .jpeg, .png)
+            Featured Image (Optional, max2MB, .jpg, .jpeg, .png, .webp)
           </label>
           
           {currentImage && !previewUrl && (
@@ -262,7 +262,7 @@ const EditBlog = () => {
             className="form-control" 
             id="featuredImage" 
             onChange={handleImageChange}
-            accept=".jpg,.jpeg,.png"
+            accept=".jpg,.jpeg,.png,.webp"
           />
           {imageError && (
             <div className="form-text text-danger">{imageError}</div>
