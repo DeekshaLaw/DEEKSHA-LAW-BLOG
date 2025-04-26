@@ -64,14 +64,7 @@ Thumbs.db
 data/db/
 
 # Uploads directory and files
-uploads/
-server/uploads/
-server/uploads/blogs/
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.webp
+
 
 # Client build artifacts
 client/dist/
