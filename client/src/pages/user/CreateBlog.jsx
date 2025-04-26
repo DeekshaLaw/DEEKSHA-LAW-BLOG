@@ -1,0 +1,226 @@
+import { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import axios from 'axios';
+import AuthContext from '../../context/AuthContext';
+import 'react-quill/dist/quill.snow.css';
+
+const CreateBlog = () => {
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const isAdmin = user && user.role === 'admin';
+  
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    category: ''
+  });
+  const [featuredImage, setFeaturedImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [imageError, setImageError] = useState('');
+  
+  const { title, content, category } = formData;
+  
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get('/categories');
+        setCategories(res.data.data);
+      } catch (err) {
+        setError('Failed to load categories.');
+        console.error(err);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
+  
+  const onChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  
+  const handleContentChange = (value) => {
+    setFormData({ ...formData, content: value });
+  };
+  
+  const handleImageChange = (e) => {
+    setImageError('');
+    
+    const file = e.target.files[0];
+    if (!file) {
+      setFeaturedImage(null);
+      setPreviewUrl(null);
+      return;
+    }
+    
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      setImageError('Only .jpg, .jpeg, and .png files are allowed.');
+      return;
+    }
+    
+    // Validate file size (minimum 2MB)
+    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > maxSize) {
+      setImageError('Image must be less than 2MB in size.');
+      return;
+    }
+    
+    setFeaturedImage(file);
+    
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    
+    // Validate form
+    if (!title || !content || !category) {
+      setError('Please fill all required fields.');
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      // Create FormData object for file upload
+      const blogFormData = new FormData();
+      blogFormData.append('title', title);
+      blogFormData.append('content', content);
+      blogFormData.append('category', category);
+      
+      if (featuredImage) {
+        blogFormData.append('featuredImage', featuredImage);
+      }
+      
+      // Submit blog
+      const res = await axios.post('/blogs', blogFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      // Redirect based on user role
+      if (isAdmin) {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to create blog.');
+      console.error(err);
+      setLoading(false);
+    }
+  };
+  
+  return (
+    <div className="container py-5">
+      <h1 className="mb-4">Create New Blog</h1>
+      
+      {isAdmin && (
+        <div className="alert alert-info mb-4" role="alert">
+          <strong>Admin Notice:</strong> As an admin, your blog will be automatically approved and visible to users immediately after creation.
+        </div>
+      )}
+      
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      )}
+      
+      <form onSubmit={onSubmit}>
+        <div className="mb-3">
+          <label htmlFor="title" className="form-label">Title</label>
+          <input 
+            type="text" 
+            className="form-control" 
+            id="title" 
+            name="title"
+            value={title}
+            onChange={onChange}
+            required
+          />
+        </div>
+        
+        <div className="mb-3">
+          <label htmlFor="category" className="form-label">Category</label>
+          <select 
+            className="form-select" 
+            id="category" 
+            name="category"
+            value={category}
+            onChange={onChange}
+            required
+          >
+            <option value="">Select a category</option>
+            {categories.map(cat => (
+              <option key={cat._id} value={cat._id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        <div className="mb-3">
+          <label htmlFor="featuredImage" className="form-label">
+            Featured Image (Optional, max 2MB, .jpg, .jpeg, .png, .webp)
+          </label>
+          <input 
+            type="file" 
+            className="form-control" 
+            id="featuredImage" 
+            onChange={handleImageChange}
+            accept=".jpg,.jpeg,.png"
+          />
+          {imageError && (
+            <div className="form-text text-danger">{imageError}</div>
+          )}
+          {previewUrl && (
+            <div className="mt-2">
+              <img 
+                src={previewUrl} 
+                alt="Preview" 
+                className="img-thumbnail" 
+                style={{ maxHeight: '200px' }}
+              />
+            </div>
+          )}
+        </div>
+        
+        <div className="mb-4">
+          <label htmlFor="content" className="form-label">Content</label>
+          <ReactQuill 
+            theme="snow"
+            value={content}
+            onChange={handleContentChange}
+            style={{ height: '300px', marginBottom: '50px' }}
+          />
+        </div>
+        
+        <div className="mb-3 mt-5">
+          <button 
+            type="submit" 
+            className="btn btn-primary"
+            disabled={loading}
+          >
+            {loading ? 'Submitting...' : 'Submit Blog'}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default CreateBlog; 
