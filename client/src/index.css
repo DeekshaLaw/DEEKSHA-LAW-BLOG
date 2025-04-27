@@ -1,9 +1,11 @@
 :root {
-  --primary-color: #003366;
-  --secondary-color: #f8f9fa;
-  --text-color: #333333;
-  --light-gray: #e9ecef;
-  --border-color: #dee2e6;
+  --primary-color: #543A14;
+  --secondary-color: #FFF0DC;
+  --accent-color: #F0BB78;
+  --text-color: #131010;
+  --light-gray: #f5f0ea;
+  --border-color: #e5d7c3;
+  --transition-speed: 0.3s;
 }
 
 body {
@@ -15,19 +17,44 @@ body {
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-color);
   background-color: var(--secondary-color);
+  line-height: 1.6;
 }
 
 .navbar {
   background-color: var(--primary-color) !important;
+  padding: 0.8rem 1rem;
+  box-shadow: 0 2px 8px rgba(19, 16, 16, 0.1);
+  transition: all var(--transition-speed) ease;
 }
 
 .navbar-brand {
   font-weight: bold;
   letter-spacing: 1px;
+  color: var(--secondary-color) !important;
+}
+
+.navbar .nav-link {
+  color: var(--secondary-color) !important;
+  opacity: 0.9;
+  transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+  padding: 0.5rem 1rem;
+  margin: 0 0.2rem;
+}
+
+.navbar .nav-link:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+.navbar-toggler {
+  border-color: var(--accent-color);
 }
 
 footer {
   margin-top: auto;
+  background-color: #131010;
+  color: var(--secondary-color);
+  padding: 2rem 0;
 }
 
 .app-container {
@@ -38,80 +65,150 @@ footer {
 
 main.container {
   flex: 1;
-  padding: 20px 15px;
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Card styling */
 .card {
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(19, 16, 16, 0.08);
   border: 1px solid var(--border-color);
+  overflow: hidden;
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+  background-color: #fff;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(19, 16, 16, 0.12);
 }
 
 .card-header {
   background-color: var(--light-gray);
   border-bottom: 1px solid var(--border-color);
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
 }
 
 /* Blog content styling */
+.blog-content {
+  font-size: 1.1rem;
+}
+
 .blog-content img {
   max-width: 100%;
   height: auto;
+  border-radius: 8px;
+  margin: 1.5rem 0;
 }
 
 .blog-content p {
-  line-height: 1.6;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+.blog-content h1, .blog-content h2, .blog-content h3,
+.blog-content h4, .blog-content h5, .blog-content h6 {
+  color: var(--primary-color);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
 }
 
 /* Forms */
+.form-control, .form-select {
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-speed) ease;
+}
+
 .form-control:focus, .form-select:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 0.25rem rgba(0, 51, 102, 0.25);
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 0.25rem rgba(240, 187, 120, 0.25);
 }
 
 /* Buttons */
+.btn {
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  transition: all var(--transition-speed) ease;
+}
+
 .btn-primary {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--primary-color);
 }
 
 .btn-primary:hover {
-  background-color: #002855;
-  border-color: #002855;
+  background-color: #e0aa60;
+  border-color: #e0aa60;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(19, 16, 16, 0.15);
 }
 
 .btn-outline-primary {
   color: var(--primary-color);
-  border-color: var(--primary-color);
+  border-color: var(--accent-color);
 }
 
 .btn-outline-primary:hover {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
+  color: var(--primary-color);
 }
 
 /* React Quill editor */
 .ql-editor {
   min-height: 200px;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.ql-toolbar {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-color: var(--border-color) !important;
+  background-color: var(--light-gray);
+}
+
+.ql-container {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-color: var(--border-color) !important;
 }
 
 /* Responsiveness */
 @media (max-width: 768px) {
   .card-body {
-    padding: 1rem;
+    padding: 1.25rem;
   }
   
   .table-responsive {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+  }
+  
+  main.container {
+    padding: 1.5rem 1rem;
   }
 }
 
 /* Fix for file upload button on some browsers */
 input[type="file"]::file-selector-button {
   border: 1px solid var(--border-color);
-  padding: 0.2em 0.4em;
-  border-radius: 0.2em;
+  padding: 0.4em 0.6em;
+  border-radius: 6px;
   background-color: var(--light-gray);
+  color: var(--primary-color);
+  transition: all var(--transition-speed) ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: var(--accent-color);
 }
 
 /* Helper for vertical spacing */
@@ -121,4 +218,68 @@ input[type="file"]::file-selector-button {
 
 .mb-6 {
   margin-bottom: 4rem;
+}
+
+/* Table styling */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th {
+  background-color: var(--light-gray);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.table th, .table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Pagination styling */
+.pagination .page-link {
+  color: var(--primary-color);
+  border-color: var(--border-color);
+  margin: 0 0.2rem;
+  border-radius: 6px;
+  transition: all var(--transition-speed) ease;
+}
+
+.pagination .page-link:hover {
+  background-color: var(--accent-color);
+  color: var(--primary-color);
+  border-color: var(--accent-color);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* Alert styling */
+.alert {
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+.alert-primary {
+  background-color: rgba(240, 187, 120, 0.2);
+  border-color: var(--accent-color);
+  color: var(--primary-color);
+}
+
+/* List group styling */
+.list-group-item {
+  border-color: var(--border-color);
+  transition: background-color var(--transition-speed) ease;
+}
+
+.list-group-item:hover {
+  background-color: var(--light-gray);
+}
+
+.list-group-item.active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
