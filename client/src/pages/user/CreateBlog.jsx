@@ -45,6 +45,31 @@ const CreateBlog = () => {
   
   const handleContentChange = (value) => {
     setFormData({ ...formData, content: value });
+    
+    // Check if content exceeds reasonable size limit
+    if (value && value.length > 500000) { // ~500KB limit for content
+      setError('Blog content is too large. Please reduce the size or split into multiple posts.');
+    } else {
+      // Clear error if it was related to content size
+      if (error && error.includes('Blog content is too large')) {
+        setError('');
+      }
+    }
+  };
+  
+  const handleTitleChange = (e) => {
+    const value = e.target.value;
+    setFormData({ ...formData, title: value });
+    
+    // Validate title length
+    if (value && value.length > 200) {
+      setError('Title is too long. Please keep it under 200 characters.');
+    } else {
+      // Clear error if it was related to title length
+      if (error && error.includes('Title is too long')) {
+        setError('');
+      }
+    }
   };
   
   const handleImageChange = (e) => {
@@ -71,6 +96,13 @@ const CreateBlog = () => {
       return;
     }
     
+    // Minimum size check for meaningful images
+    const minSize = 5 * 1024; // 5KB in bytes
+    if (file.size < minSize) {
+      setImageError('Image is too small. Please use a higher quality image (at least 5KB).');
+      return;
+    }
+    
     setFeaturedImage(file);
     
     // Create preview URL
@@ -93,10 +125,25 @@ const CreateBlog = () => {
       return;
     }
     
+    // Additional validation
+    if (title.trim().length < 3) {
+      setError('Title is too short. Please provide a meaningful title.');
+      setLoading(false);
+      return;
+    }
+    
+    // Check if content is just HTML tags without meaningful content
+    const plainTextContent = content.replace(/<[^>]*>/g, '').trim();
+    if (plainTextContent.length < 50) {
+      setError('Content is too short. Please provide more detailed content (at least 50 characters).');
+      setLoading(false);
+      return;
+    }
+    
     try {
       // Create FormData object for file upload
       const blogFormData = new FormData();
-      blogFormData.append('title', title);
+      blogFormData.append('title', title.trim());
       blogFormData.append('content', content);
       blogFormData.append('category', category);
       
@@ -147,9 +194,10 @@ const CreateBlog = () => {
             type="text" 
             className="form-control" 
             id="title" 
-            name="title"
             value={title}
-            onChange={onChange}
+            onChange={handleTitleChange}
+            placeholder="Enter blog title"
+            maxLength="200"
             required
           />
         </div>

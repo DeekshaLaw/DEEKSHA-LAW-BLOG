@@ -11,8 +11,13 @@ const isTokenExpired = (token) => {
   
   try {
     const decoded = jwtDecode(token);
+    // Add an extra safety check for malformed tokens
+    if (!decoded || typeof decoded !== 'object' || !decoded.exp) {
+      return true;
+    }
     return decoded.exp * 1000 < Date.now();
   } catch (err) {
+    console.error('Token validation error:', err);
     return true;
   }
 };
@@ -128,26 +133,42 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       console.log("Login attempt with:", formData.email);
+      
+      // Validate inputs before sending request
+      if (!formData.email || !formData.password) {
+        setError('Email and password are required');
+        throw new Error('Email and password are required');
+      }
+      
       const res = await axios.post('/auth/login', formData);
       console.log("Login response:", res.data);
       
       // Check if token is present in response
       if (!res.data.token) {
         console.error("No token received in login response");
+        setError('Authentication failed - no token received');
         throw new Error("Authentication failed - no token received");
       }
-      
-      // Store token in localStorage first
-      localStorage.setItem('token', res.data.token);
-      
-      // Set token in state and axios headers
-      setToken(res.data.token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
       
       // Try to decode the token to verify it has the right structure
       try {
         const decoded = jwtDecode(res.data.token);
+        
+        // Validate token structure
+        if (!decoded || typeof decoded !== 'object' || !decoded.id) {
+          console.error("Invalid token structure:", decoded);
+          setError('Invalid authentication token received');
+          throw new Error('Invalid authentication token structure');
+        }
+        
         console.log("Decoded token:", decoded);
+        
+        // Store token in localStorage first
+        localStorage.setItem('token', res.data.token);
+        
+        // Set token in state and axios headers
+        setToken(res.data.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
         
         // Set user data directly from the login response
         setUser(res.data.user);
@@ -155,6 +176,8 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       } catch (decodeErr) {
         console.error("Token decode error:", decodeErr);
+        setError('Invalid authentication token');
+        throw decodeErr;
       }
       
       return res.data;

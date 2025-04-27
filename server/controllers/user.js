@@ -64,6 +64,27 @@ exports.updateUser = async (req, res) => {
       });
     }
     
+    // Prevent changing own role
+    if (user._id.toString() === req.user.id) {
+      if (role && role !== user.role) {
+        return res.status(403).json({
+          success: false,
+          message: 'You cannot change your own role'
+        });
+      }
+    }
+    
+    // Check if attempting to change role (either promote to admin or demote from admin)
+    if (role && role !== user.role) {
+      // Only admin@deekshalaw.in can change user roles to/from admin
+      if (req.user.email !== 'admin@deekshalaw.in') {
+        return res.status(403).json({
+          success: false,
+          message: 'Only the primary admin can change admin roles'
+        });
+      }
+    }
+    
     // Update user
     user = await User.findByIdAndUpdate(
       req.params.id,

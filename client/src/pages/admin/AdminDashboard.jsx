@@ -39,41 +39,88 @@ const AdminDashboard = () => {
         // Log the headers for debugging
         console.log('Authorization header:', token ? `Bearer ${token}` : 'Not set');
         
-        // Fetch blogs with applied filters and explicit auth header
-        const blogsRes = await axios.get('/blogs', { 
-          params,
-          headers: {
-            Authorization: token ? `Bearer ${token}` : ''
-          }
-        });
-        
-        console.log('Blog response data:', blogsRes.data);
-        
-        // If viewing any status other than pending, fetch the pending count separately
-        if (filters.status !== 'pending') {
-          const pendingRes = await axios.get('/blogs', {
-            params: { status: 'pending' },
+        // Initialize data objects in case of errors
+        let blogsData = { data: [], count: 0 };
+        let categoriesData = { data: [] };
+        let usersData = { data: [] };
+        let pendingCount = 0;
+        let blogsError = false;
+        let categoriesError = false;
+        let usersError = false;
+      
+        try {
+          // Fetch blogs with applied filters and explicit auth header
+          const blogsRes = await axios.get('/blogs', { 
+            params,
             headers: {
               Authorization: token ? `Bearer ${token}` : ''
             }
           });
-          setPendingCount(pendingRes.data.count);
-        } else {
-          setPendingCount(blogsRes.data.count);
+          
+          console.log('Blog response data:', blogsRes.data);
+          blogsData = blogsRes.data;
+          
+          // If viewing any status other than pending, fetch the pending count separately
+          if (filters.status !== 'pending') {
+            try {
+              const pendingRes = await axios.get('/blogs', {
+                params: { status: 'pending' },
+                headers: {
+                  Authorization: token ? `Bearer ${token}` : ''
+                }
+              });
+              pendingCount = pendingRes.data.count;
+            } catch (pendingErr) {
+              console.error('Error fetching pending count:', pendingErr);
+              pendingCount = 0;
+            }
+          } else {
+            pendingCount = blogsData.count;
+          }
+        } catch (err) {
+          console.error('Error fetching blogs:', err);
+          blogsError = true;
         }
         
-        // Fetch categories
-        const categoriesRes = await axios.get('/categories');
+        try {
+          // Fetch categories
+          const categoriesRes = await axios.get('/categories');
+          categoriesData = categoriesRes.data;
+        } catch (err) {
+          console.error('Error fetching categories:', err);
+          categoriesError = true;
+        }
         
-        // Fetch users
-        const usersRes = await axios.get('/users');
+        try {
+          // Fetch users
+          const usersRes = await axios.get('/users');
+          usersData = usersRes.data;
+        } catch (err) {
+          console.error('Error fetching users:', err);
+          usersError = true;
+        }
         
-        setBlogs(blogsRes.data.data);
-        setCategories(categoriesRes.data.data);
-        setUsers(usersRes.data.data);
+        // Set data regardless of partial failures
+        setBlogs(blogsData.data || []);
+        setCategories(categoriesData.data || []);
+        setUsers(usersData.data || []);
+        setPendingCount(pendingCount);
+        
+        // Set appropriate error messages
+        if (blogsError && categoriesError && usersError) {
+          setError('Failed to load dashboard data. Please try again.');
+        } else if (blogsError) {
+          setError('Failed to load blogs data. Categories and users were loaded successfully.');
+        } else if (categoriesError && usersError) {
+          setError('Failed to load categories and users. Blogs were loaded successfully.');
+        } else if (categoriesError) {
+          setError('Failed to load categories. Other data was loaded successfully.');
+        } else if (usersError) {
+          setError('Failed to load users. Other data was loaded successfully.');
+        }
       } catch (err) {
-        setError('Failed to load data. Please try again.');
-        console.error('Error fetching data:', err);
+        setError('An unexpected error occurred. Please refresh the page.');
+        console.error('Error in fetchData:', err);
       } finally {
         setLoading(false);
       }

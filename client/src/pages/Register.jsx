@@ -27,6 +27,25 @@ const Register = () => {
     setLoading(true);
     setError('');
     
+    // Trim input values to prevent whitespace-only inputs
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+    
+    // Validate name
+    if (!trimmedName) {
+      setError('Name cannot be empty');
+      setLoading(false);
+      return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
+    
     // Validate passwords match
     if (password !== confirmPassword) {
       setError('Passwords do not match');
@@ -41,16 +60,30 @@ const Register = () => {
       return;
     }
     
+    // Validate password complexity
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    
+    if (!hasNumber || !hasSpecialChar) {
+      setError('Password must contain at least one number and one special character');
+      setLoading(false);
+      return;
+    }
+    
     try {
       // Submit only name, email, and password (not confirmPassword)
       const { confirmPassword, ...submitData } = formData;
+      
+      // Use the trimmed values
+      submitData.name = trimmedName;
+      submitData.email = trimmedEmail;
       
       await register(submitData);
       setSuccess(true);
       
       // Redirect to email verification
       setTimeout(() => {
-        navigate('/verify-email', { state: { email } });
+        navigate('/verify-email', { state: { email: trimmedEmail } });
       }, 2000);
       
     } catch (err) {
