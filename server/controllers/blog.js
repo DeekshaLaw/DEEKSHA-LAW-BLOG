@@ -310,7 +310,7 @@ exports.deleteBlog = async (req, res) => {
       }
     }
     
-    await blog.remove();
+    await Blog.findByIdAndDelete(req.params.id);
     
     res.status(200).json({
       success: true,

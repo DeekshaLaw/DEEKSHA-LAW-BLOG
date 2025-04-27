@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import DOMPurify from 'dompurify';
 import AuthContext from '../context/AuthContext';
 import ScrollToTop from '../components/common/ScrollToTop';
 
@@ -164,6 +165,9 @@ const BlogDetails = () => {
     like => user && like.user === user.id
   );
   
+  // Sanitize blog content with DOMPurify
+  const sanitizedContent = DOMPurify.sanitize(blog.content);
+  
   return (
     <div className="container py-5">
       <div className="row">
@@ -215,7 +219,7 @@ const BlogDetails = () => {
           
           {/* Blog content */}
           <div className="blog-content mb-5">
-            <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
           </div>
           
           {/* Like button */}
