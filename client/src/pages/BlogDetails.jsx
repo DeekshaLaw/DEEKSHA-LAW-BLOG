@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
+import ScrollToTop from '../components/common/ScrollToTop';
 
 const BlogDetails = () => {
   const { id } = useParams();
@@ -287,6 +288,9 @@ const BlogDetails = () => {
           </div>
         </div>
       </div>
+      
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
     </div>
   );
 };

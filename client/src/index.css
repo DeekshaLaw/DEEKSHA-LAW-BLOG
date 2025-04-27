@@ -283,3 +283,36 @@ input[type="file"]::file-selector-button:hover {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
 }
+
+/* Scroll to top button */
+.scroll-to-top-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  color: var(--text-color);
+  border: none;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  transition: all var(--transition-speed) ease;
+  z-index: 1000;
+  opacity: 0.9;
+}
+
+.scroll-to-top-btn:hover {
+  background-color: #e0aa60;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+}
+
+.scroll-to-top-btn:focus {
+  outline: none;
+}
