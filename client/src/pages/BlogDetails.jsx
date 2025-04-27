@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../config/axios';
 import DOMPurify from 'dompurify';
 import AuthContext from '../context/AuthContext';
 import ScrollToTop from '../components/common/ScrollToTop';
@@ -21,6 +21,9 @@ const BlogDetails = () => {
   const [commentLoading, setCommentLoading] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
   
+  // Get the base URL for uploads from the environment variables
+  const uploadsBaseUrl = import.meta.env.VITE_UPLOADS_URL;
+  
   useEffect(() => {
     const fetchBlog = async () => {
       try {
@@ -29,9 +32,6 @@ const BlogDetails = () => {
         
         // Get token from localStorage for authorization
         const token = localStorage.getItem('token');
-        console.log('Token available:', !!token);
-        console.log('User role:', user?.role);
-        console.log('Is admin preview?', location.state?.adminPreview);
         
         // Include special admin flag when admin is previewing
         const headers = {
@@ -42,15 +42,11 @@ const BlogDetails = () => {
         let url = `/blogs/${id}`;
         if (user?.role === 'admin' && location.state?.adminPreview) {
           url += '?admin_preview=true';
-          console.log('Adding admin_preview parameter to URL');
         }
         
-        console.log('Making request to:', url);
         const res = await axios.get(url, { headers });
-        console.log('Response received:', res.status);
         setBlog(res.data.data);
       } catch (err) {
-        console.error('Blog fetch error details:', err);
         setError('Blog not found or you do not have permission to view it.');
       } finally {
         setLoading(false);
@@ -80,7 +76,6 @@ const BlogDetails = () => {
       });
     } catch (err) {
       setError('Failed to like blog.');
-      console.error(err);
     } finally {
       setLikeLoading(false);
     }
@@ -112,7 +107,6 @@ const BlogDetails = () => {
       setComment('');
     } catch (err) {
       setError('Failed to add comment.');
-      console.error(err);
     } finally {
       setCommentLoading(false);
     }
@@ -210,9 +204,10 @@ const BlogDetails = () => {
           {blog.featuredImage && (
             <div className="mb-4">
               <img 
-                src={`http://localhost:5000${blog.featuredImage}`} 
+                src={`${uploadsBaseUrl}${blog.featuredImage}`} 
                 className="img-fluid rounded" 
                 alt={blog.title}
+                loading="lazy"
               />
             </div>
           )}

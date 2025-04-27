@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../config/axios';
 
 const Home = () => {
   const [blogs, setBlogs] = useState([]);
@@ -8,6 +8,9 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  
+  // Get the base URL for uploads from the environment variables
+  const uploadsBaseUrl = import.meta.env.VITE_UPLOADS_URL;
   
   useEffect(() => {
     const fetchData = async () => {
@@ -97,10 +100,11 @@ const Home = () => {
               <div className="card h-100">
                 {blog.featuredImage ? (
                   <img 
-                    src={`http://localhost:5000${blog.featuredImage}`} 
+                    src={`${uploadsBaseUrl}${blog.featuredImage}`} 
                     className="card-img-top" 
                     alt={blog.title}
                     style={{ height: '200px', objectFit: 'cover' }}
+                    loading="lazy"
                   />
                 ) : (
                   <div 

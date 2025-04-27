@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from './config/axios';
 
 // Context
 import { AuthProvider } from './context/AuthContext';
@@ -31,8 +31,7 @@ import Categories from './pages/admin/Categories';
 import Users from './pages/admin/Users';
 import UserActivity from './pages/admin/UserActivity';
 
-// Set axios defaults
-axios.defaults.baseURL = 'http://localhost:5000/api';
+// Note: Axios defaults are configured in ./config/axios.js
 
 function App() {
   return (

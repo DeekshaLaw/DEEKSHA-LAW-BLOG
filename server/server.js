@@ -10,6 +10,7 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 // Set essential environment variables if not loaded from .env
 process.env.JWT_SECRET = process.env.JWT_SECRET || "deeksha_law_secret_key";
 process.env.JWT_EXPIRE = process.env.JWT_EXPIRE || "30d";
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -21,7 +22,15 @@ const userRoutes = require('./routes/user');
 const app = express();
 
 // Middleware
-app.use(cors());
+// Configure CORS for production
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://deekshalaw.com', 'https://www.deekshalaw.com'] 
+    : 'http://localhost:5173',
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -40,7 +49,7 @@ app.get('/', (req, res) => {
 });
 
 // Connect to MongoDB
-const MONGO_URI = "mongodb+srv://harsharsm007:6UWJEOyssPqbuzyx@deekshalawblog.axpqkdx.mongodb.net/?retryWrites=true&w=majority&appName=DEEKSHALAWBLOG";
+const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 5000;
 
 console.log("MongoDB URI:", MONGO_URI);
@@ -50,7 +59,7 @@ mongoose
   .then(() => {
     console.log('Connected to MongoDB');
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server is running on port ${PORT} in ${process.env.NODE_ENV} mode`);
     });
   })
   .catch((err) => {

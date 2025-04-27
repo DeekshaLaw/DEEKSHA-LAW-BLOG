@@ -1,131 +1,118 @@
-# DEEKSHA LAW Blogging Platform
+# DEEKSHA LAW Blog Platform
 
-A complete blogging platform for DEEKSHA LAW built using the MERN stack (MongoDB, Express.js, React.js, Node.js).
+A professional legal blogging platform that allows users to create, read, and interact with legal content.
 
 ## Features
 
-### Authentication
-- JWT-based authentication for users and admins with role-based access control
-- OTP email verification on user registration
-- Password hashing for secure storage
+- **User Authentication**: Registration, login, email verification, and password reset
+- **Blog Management**: Create, edit, and publish blogs with rich text editor
+- **Admin Dashboard**: Approve/reject blogs, manage categories, and user administration
+- **Interactive Features**: Comments and likes on blogs
+- **Responsive Design**: Works on all devices
 
-### User Features
-- Register and login with email verification
-- User dashboard with tabs for approved, pending, and rejected blogs
-- Create blog posts with React Quill editor
-- Upload featured images (optional)
-- Select categories for blogs
-- View blog post statuses
-- Like and comment on approved blogs
+## Technology Stack
 
-### Admin Features
-- Admin dashboard to manage all blogs
-- Filter blogs by status, category, or user
-- Approve or reject user-submitted blogs
-- Post blogs directly (approved by default)
-- Manage blog categories (create, edit, delete)
-- View list of all registered users
-- Promote users to admin or demote admins to users
+### Backend
+- Node.js & Express.js
+- MongoDB with Mongoose
+- JWT for authentication
+- Multer for file uploads
 
-### Guest Access
-- View only approved blogs
-- No ability to like, comment, or create blogs
-- No access to any dashboard or restricted routes
+### Frontend
+- React.js
+- React Router
+- Axios for API calls
+- React Quill for rich text editing
+- Bootstrap for styling
 
-## Prerequisites
+## Getting Started
 
-- Node.js (v14 or higher)
-- MongoDB (local or Atlas)
-- NPM or Yarn
+### Prerequisites
+- Node.js (v16+)
+- MongoDB Atlas account or local MongoDB instance
+- Git
 
-## Installation
+### Development Setup
 
-### Clone the repository
-```bash
-git clone <repository-url>
-cd deeksha-law
+#### Backend
+
+1. Navigate to the server directory:
+   ```
+   cd server
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Create a `.env` file (copy from `.env.example` and fill in your values)
+
+4. Start the development server:
+   ```
+   npm run dev
+   ```
+
+#### Frontend
+
+1. Navigate to the client directory:
+   ```
+   cd client
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Create a `.env.development` file (it should already be configured)
+
+4. Start the development server:
+   ```
+   npm run dev
+   ```
+
+## Production Deployment
+
+For detailed production deployment instructions, please refer to [DEPLOYMENT.md](DEPLOYMENT.md).
+
+### Quick Deployment with Docker
+
+1. Clone the repository
+2. Copy `.env.example` to `.env` and update the values
+3. Run the deployment script:
+   ```
+   bash deploy.sh
+   ```
+
+## Project Structure
+
 ```
-
-### Install backend dependencies
-```bash
-cd server
-npm install
+deeksha-law-blog/
+├── client/              # React frontend
+│   ├── public/          # Static files
+│   │   ├── assets/      # Images and assets
+│   │   ├── components/  # React components
+│   │   ├── config/      # Configuration files
+│   │   ├── context/     # React context providers
+│   │   └── pages/       # Page components
+│   ├── .env.development # Development environment variables
+│   └── .env.production  # Production environment variables
+├── server/              # Node.js backend
+│   ├── controllers/     # Route controllers
+│   ├── middleware/      # Express middlewares
+│   ├── models/          # Mongoose models
+│   ├── routes/          # API routes
+│   ├── utils/           # Utility functions
+│   └── .env             # Environment variables
+├── docker-compose.yml   # Docker Compose configuration
+└── deploy.sh            # Deployment script
 ```
-
-### Install frontend dependencies
-```bash
-cd ../client
-npm install
-```
-
-### Configure Environment Variables
-Create a `.env` file in the server directory with the following variables:
-```
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/deeksha_law
-JWT_SECRET=your_jwt_secret_key
-JWT_EXPIRE=7d
-EMAIL_SERVICE=gmail
-EMAIL_USERNAME=your-email@gmail.com
-EMAIL_PASSWORD=your-app-password
-EMAIL_FROM=noreply@deekshalaw.com
-```
-
-## Running the Application
-
-### Start the backend server
-```bash
-cd server
-npm run dev
-```
-
-### Start the frontend development server
-```bash
-cd ../client
-npm run dev
-```
-
-The frontend will be available at http://localhost:5173 and the backend API at http://localhost:5000.
-
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/verify` - Verify email with OTP
-- `POST /api/auth/resend-verification` - Resend verification OTP
-- `POST /api/auth/login` - Login a user
-- `GET /api/auth/me` - Get current user info
-- `GET /api/auth/logout` - Logout user
-
-### Blogs
-- `GET /api/blogs` - Get all blogs (filtered by status for non-admins)
-- `GET /api/blogs/:id` - Get a single blog
-- `POST /api/blogs` - Create a new blog
-- `PUT /api/blogs/:id` - Update a blog
-- `DELETE /api/blogs/:id` - Delete a blog
-- `PUT /api/blogs/:id/status` - Update blog status (admin only)
-- `POST /api/blogs/:id/comments` - Add a comment to a blog
-- `PUT /api/blogs/:id/like` - Like/unlike a blog
-- `GET /api/blogs/user/:status` - Get user blogs by status
-
-### Categories
-- `GET /api/categories` - Get all categories
-- `GET /api/categories/:id` - Get a single category
-- `POST /api/categories` - Create a new category (admin only)
-- `PUT /api/categories/:id` - Update a category (admin only)
-- `DELETE /api/categories/:id` - Delete a category (admin only)
-
-### Users
-- `GET /api/users` - Get all users (admin only)
-- `GET /api/users/:id` - Get a single user (admin only)
-- `PUT /api/users/:id` - Update a user (admin only)
-- `DELETE /api/users/:id` - Delete a user (admin only)
-- `PUT /api/users/profile` - Update user profile
-
-## File Upload Requirements
-- Allowed image types: .jpg, .jpeg, .png
-- Minimum file size: 2MB
-- Images stored in server/uploads/blogs/ directory
 
 ## License
-This project is licensed under the MIT License. 
+
+This project is proprietary and owned by DEEKSHA LAW.
+
+## Contact
+
+For support or inquiries, please contact [support@deekshalaw.com](mailto:support@deekshalaw.com). 

@@ -28,6 +28,9 @@ const EditBlog = () => {
   
   const isAdmin = user && user.role === 'admin';
   
+  // Get the base URL for uploads from the environment variables
+  const uploadsBaseUrl = import.meta.env.VITE_UPLOADS_URL;
+  
   // Fetch blog and categories on component mount
   useEffect(() => {
     const fetchData = async () => {
@@ -164,7 +167,6 @@ const EditBlog = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update blog.');
-      console.error(err);
       setSubmitting(false);
     }
   };
@@ -242,7 +244,7 @@ const EditBlog = () => {
           {currentImage && !previewUrl && (
             <div className="mb-2">
               <img 
-                src={`http://localhost:5000${currentImage}`}
+                src={`${uploadsBaseUrl}${currentImage}`}
                 alt="Current featured" 
                 className="img-thumbnail" 
                 style={{ maxHeight: '200px' }}
