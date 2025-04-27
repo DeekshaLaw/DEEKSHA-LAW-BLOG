@@ -219,6 +219,9 @@ const Login = () => {
                       disabled={loading}
                       required
                     />
+                    <div className="mt-1 text-end">
+                      <Link to="/forgot-password" className="small text-decoration-none">Forgot Password?</Link>
+                    </div>
                   </div>
                   <div className="mb-3">
                     <button 
@@ -235,9 +238,6 @@ const Login = () => {
               <div className="mt-3 text-center">
                 <p>
                   Don't have an account? <Link to="/register">Register</Link>
-                </p>
-                <p>
-                  <Link to="/admin-login">Login as Admin</Link>
                 </p>
               </div>
             </div>

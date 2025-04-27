@@ -6,7 +6,10 @@ const {
   logout,
   verifyEmail,
   resendVerification,
-  checkAdmin
+  checkAdmin,
+  forgotPassword,
+  resetPassword,
+  verifyResetOTP
 } = require('../controllers/auth');
 const { protect } = require('../middleware/auth');
 
@@ -18,6 +21,9 @@ router.post('/verify', verifyEmail);
 router.post('/resend-verification', resendVerification);
 router.post('/login', login);
 router.post('/check-admin', checkAdmin);
+router.post('/forgot-password', forgotPassword);
+router.post('/verify-reset-otp', verifyResetOTP);
+router.post('/reset-password', resetPassword);
 router.get('/me', protect, getMe);
 router.get('/logout', protect, logout);
 

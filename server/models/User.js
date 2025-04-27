@@ -35,6 +35,7 @@ const UserSchema = new mongoose.Schema({
   verificationTokenExpire: Date,
   resetPasswordToken: String,
   resetPasswordExpire: Date,
+  resetAttempts: Number,
   createdAt: {
     type: Date,
     default: Date.now
@@ -79,6 +80,20 @@ UserSchema.methods.getVerificationToken = function() {
   
   // Set expire (10 minutes)
   this.verificationTokenExpire = Date.now() + 10 * 60 * 1000;
+  
+  return otp;
+};
+
+// Generate reset password token
+UserSchema.methods.getResetPasswordToken = function() {
+  // Generate a 6 digit OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  
+  // Store the OTP in the resetPasswordToken field
+  this.resetPasswordToken = otp;
+  
+  // Set expire (10 minutes)
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
   
   return otp;
 };

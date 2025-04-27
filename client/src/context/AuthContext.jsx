@@ -209,6 +209,70 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Forgot Password - Send reset OTP
+  const forgotPassword = async (email) => {
+    try {
+      setError(null);
+      
+      // Create a clean axios instance without auth headers for this request
+      const axiosInstance = axios.create({
+        baseURL: axios.defaults.baseURL
+      });
+      
+      // Make API call without authorization header
+      const res = await axiosInstance.post('/auth/forgot-password', { email });
+      
+      return res.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error processing password reset request');
+      throw err;
+    }
+  };
+
+  // Reset Password with OTP
+  const resetPassword = async ({ email, otp, password }) => {
+    try {
+      setError(null);
+      
+      // Create a clean axios instance without auth headers for this request
+      const axiosInstance = axios.create({
+        baseURL: axios.defaults.baseURL
+      });
+      
+      // Make API call without authorization header
+      const res = await axiosInstance.post('/auth/reset-password', { 
+        email, 
+        otp, 
+        password 
+      });
+      
+      return res.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error resetting password');
+      throw err;
+    }
+  };
+
+  // Verify Reset Password OTP
+  const verifyResetOTP = async ({ email, otp }) => {
+    try {
+      setError(null);
+      
+      // Create a clean axios instance without auth headers for this request
+      const axiosInstance = axios.create({
+        baseURL: axios.defaults.baseURL
+      });
+      
+      // Make API call without authorization header
+      const res = await axiosInstance.post('/auth/verify-reset-otp', { email, otp });
+      
+      return res.data;
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error verifying OTP');
+      throw err;
+    }
+  };
+
   // Load user when token changes
   useEffect(() => {
     loadUser();
@@ -227,7 +291,10 @@ export const AuthProvider = ({ children }) => {
         resendVerification,
         login,
         logout,
-        updateProfile
+        updateProfile,
+        forgotPassword,
+        resetPassword,
+        verifyResetOTP
       }}
     >
       {children}

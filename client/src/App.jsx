@@ -17,6 +17,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminLogin from './pages/AdminLogin';
 import VerifyEmail from './pages/VerifyEmail';
+import ForgotPassword from './pages/ForgotPassword';
 import BlogDetails from './pages/BlogDetails';
 
 // User Pages
@@ -47,6 +48,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/blogs/:id" element={<BlogDetails />} />
               
               {/* User Protected Routes */}
