@@ -1,3 +1,6 @@
+/* Import Font Awesome for icons */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
 :root {
   --primary-color: #543A14;
   --secondary-color: #FFF0DC;
@@ -272,16 +275,50 @@ input[type="file"]::file-selector-button:hover {
 /* List group styling */
 .list-group-item {
   border-color: var(--border-color);
-  transition: background-color var(--transition-speed) ease;
+  transition: all var(--transition-speed) ease;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
 }
 
 .list-group-item:hover {
   background-color: var(--light-gray);
+  transform: translateX(5px);
 }
 
 .list-group-item.active {
   background-color: var(--primary-color);
   border-color: var(--primary-color);
+  box-shadow: 0 4px 8px rgba(19, 16, 16, 0.15);
+}
+
+.list-group-item.active:hover {
+  transform: translateX(5px);
+  background-color: var(--primary-color);
+}
+
+/* Admin sidebar specific styling */
+.admin-sidebar .list-group {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(19, 16, 16, 0.08);
+}
+
+.admin-sidebar .list-group-item {
+  border-left: 4px solid transparent;
+  display: flex;
+  align-items: center;
+}
+
+.admin-sidebar .list-group-item i {
+  margin-right: 0.5rem;
+}
+
+.admin-sidebar .list-group-item.active {
+  border-left-color: var(--accent-color);
+}
+
+.admin-sidebar .list-group-item:not(:last-child) {
+  border-bottom: 1px solid var(--border-color);
 }
 
 /* Scroll to top button */

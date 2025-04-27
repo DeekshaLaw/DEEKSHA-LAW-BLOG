@@ -261,19 +261,21 @@ const AdminDashboard = () => {
         </div>
         
         <div className="col-md-3">
-          <div className="list-group">
-            <Link to="/admin/dashboard" className="list-group-item list-group-item-action active">
-              Dashboard
-            </Link>
-            <Link to="/admin/categories" className="list-group-item list-group-item-action">
-              Manage Categories
-            </Link>
-            <Link to="/admin/users" className="list-group-item list-group-item-action">
-              Manage Users
-            </Link>
-            <Link to="/admin/user-activity" className="list-group-item list-group-item-action">
-              User Activity Tracking
-            </Link>
+          <div className="admin-sidebar mb-4">
+            <div className="list-group">
+              <Link className="list-group-item active" to="/admin/dashboard">
+                <i className="fas fa-tachometer-alt"></i> Dashboard
+              </Link>
+              <Link className="list-group-item" to="/admin/categories">
+                <i className="fas fa-tags"></i> Manage Categories
+              </Link>
+              <Link className="list-group-item" to="/admin/users">
+                <i className="fas fa-users"></i> Manage Users
+              </Link>
+              <Link className="list-group-item" to="/admin/user-activity">
+                <i className="fas fa-file-alt"></i> User Activity Tracking
+              </Link>
+            </div>
           </div>
         </div>
       </div>
