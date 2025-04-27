@@ -28,6 +28,7 @@ import EditBlog from './pages/user/EditBlog';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Categories from './pages/admin/Categories';
 import Users from './pages/admin/Users';
+import UserActivity from './pages/admin/UserActivity';
 
 // Set axios defaults
 axios.defaults.baseURL = 'http://localhost:5000/api';
@@ -74,6 +75,10 @@ function App() {
               <Route 
                 path="/admin/users" 
                 element={<AdminRoute component={Users} />} 
+              />
+              <Route 
+                path="/admin/user-activity" 
+                element={<AdminRoute component={UserActivity} />} 
               />
             </Routes>
           </main>

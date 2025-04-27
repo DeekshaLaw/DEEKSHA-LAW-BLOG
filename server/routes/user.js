@@ -8,7 +8,11 @@ const {
   getUserLikes,
   getUserComments,
   deleteUserComment,
-  getCurrentUser
+  getCurrentUser,
+  getUserLikesById,
+  getUserCommentsById,
+  deleteUserLikeById,
+  deleteUserCommentById
 } = require('../controllers/user');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -28,5 +32,9 @@ router.get('/', getUsers);
 router.get('/:id', getUser);
 router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
+router.get('/:id/activity/likes', getUserLikesById);
+router.get('/:id/activity/comments', getUserCommentsById);
+router.delete('/:userId/activity/likes/:blogId', deleteUserLikeById);
+router.delete('/:userId/activity/comments/:blogId/:commentId', deleteUserCommentById);
 
 module.exports = router; 

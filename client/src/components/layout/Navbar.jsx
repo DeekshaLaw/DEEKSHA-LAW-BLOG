@@ -70,6 +70,9 @@ const Navbar = () => {
         <Link className="nav-link" to="/admin/users">Users</Link>
       </li>
       <li className="nav-item">
+        <Link className="nav-link" to="/admin/user-activity">User Activity</Link>
+      </li>
+      <li className="nav-item">
         <Link className="nav-link" to="/blogs/create">Create Blog</Link>
       </li>
       <li className="nav-item dropdown">

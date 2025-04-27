@@ -261,21 +261,19 @@ const AdminDashboard = () => {
         </div>
         
         <div className="col-md-3">
-          <div className="card h-100">
-            <div className="card-header">
-              <h5 className="mb-0">Quick Actions</h5>
-            </div>
-            <div className="card-body d-flex flex-column">
-              <Link to="/blogs/create" className="btn btn-primary mb-2">
-                Create New Blog
-              </Link>
-              <Link to="/admin/categories" className="btn btn-outline-primary mb-2">
-                Manage Categories
-              </Link>
-              <Link to="/admin/users" className="btn btn-outline-primary">
-                Manage Users
-              </Link>
-            </div>
+          <div className="list-group">
+            <Link to="/admin/dashboard" className="list-group-item list-group-item-action active">
+              Dashboard
+            </Link>
+            <Link to="/admin/categories" className="list-group-item list-group-item-action">
+              Manage Categories
+            </Link>
+            <Link to="/admin/users" className="list-group-item list-group-item-action">
+              Manage Users
+            </Link>
+            <Link to="/admin/user-activity" className="list-group-item list-group-item-action">
+              User Activity Tracking
+            </Link>
           </div>
         </div>
       </div>

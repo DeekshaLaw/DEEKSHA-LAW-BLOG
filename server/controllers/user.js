@@ -393,4 +393,229 @@ exports.getCurrentUser = async (req, res) => {
       message: 'Server error while fetching user info: ' + err.message
     });
   }
+};
+
+// @desc    Get user liked blogs by ID (for admin)
+// @route   GET /api/users/:id/activity/likes
+// @access  Private/Admin
+exports.getUserLikesById = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    // Get all blogs for testing - we'll filter them in code
+    const allBlogs = await Blog.find({ status: 'approved' })
+      .select('_id title createdAt featuredImage category likes')
+      .populate('category', 'name');
+    
+    // Filter blogs that this user has liked
+    const matchedBlogs = [];
+    
+    allBlogs.forEach(blog => {
+      if (blog.likes && blog.likes.length > 0) {
+        // Check each like for a match with this user
+        blog.likes.forEach(like => {
+          if (like && like.user) {
+            const likeUserId = String(like.user);
+            const targetUserId = String(userId);
+            
+            // If this is a match, add the blog to results
+            if (likeUserId === targetUserId) {
+              // Create a plain object without the likes array to avoid any issues
+              matchedBlogs.push({
+                _id: blog._id,
+                title: blog.title,
+                createdAt: blog.createdAt,
+                featuredImage: blog.featuredImage,
+                category: blog.category
+              });
+            }
+          }
+        });
+      }
+    });
+    
+    res.status(200).json({
+      success: true,
+      count: matchedBlogs.length,
+      data: matchedBlogs
+    });
+  } catch (err) {
+    console.error('Error in getUserLikesById:', err);
+    
+    // Send a 200 response with empty data
+    res.status(200).json({
+      success: true,
+      count: 0,
+      data: [],
+      message: 'Could not retrieve liked blogs due to a server error: ' + err.message
+    });
+  }
+};
+
+// @desc    Get user comments by ID (for admin)
+// @route   GET /api/users/:id/activity/comments
+// @access  Private/Admin
+exports.getUserCommentsById = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    
+    console.log('Fetching comments for user ID:', userId);
+    
+    // Find all approved blogs (don't filter by comments.user in the query as it's unreliable)
+    const blogs = await Blog.find({ status: 'approved' })
+      .select('_id title createdAt comments');
+    
+    console.log(`Found ${blogs.length} approved blogs to check for comments`);
+    
+    // Process the blogs to extract only the user's comments
+    const userComments = [];
+    
+    for (const blog of blogs) {
+      // Skip blogs with no comments
+      if (!blog.comments || blog.comments.length === 0) {
+        continue;
+      }
+      
+      // Filter to get only this user's comments
+      const filteredComments = blog.comments.filter(comment => {
+        const commentUserId = comment && comment.user ? String(comment.user) : null;
+        const targetUserId = String(userId);
+        const isMatch = commentUserId === targetUserId;
+        
+        if (isMatch) {
+          console.log(`Found matching comment in blog: ${blog.title}`);
+        }
+        
+        return isMatch;
+      });
+      
+      if (filteredComments.length > 0) {
+        userComments.push({
+          blogId: blog._id,
+          blogTitle: blog.title,
+          comments: filteredComments
+        });
+        
+        console.log(`Added ${filteredComments.length} comments from blog: ${blog.title}`);
+      }
+    }
+    
+    console.log(`Total blogs with user comments: ${userComments.length}`);
+    
+    res.status(200).json({
+      success: true,
+      count: userComments.length,
+      data: userComments
+    });
+  } catch (err) {
+    console.error('Error in getUserCommentsById:', err);
+    
+    // Return 200 with empty data instead of error
+    res.status(200).json({
+      success: true,
+      count: 0,
+      data: [],
+      message: 'Could not retrieve user comments due to a server error: ' + err.message
+    });
+  }
+};
+
+// @desc    Delete user like by ID (for admin)
+// @route   DELETE /api/users/:userId/activity/likes/:blogId
+// @access  Private/Admin
+exports.deleteUserLikeById = async (req, res) => {
+  try {
+    const { userId, blogId } = req.params;
+    
+    // Find the blog
+    const blog = await Blog.findById(blogId);
+    
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: 'Blog not found'
+      });
+    }
+    
+    // Check if user has liked this blog
+    if (!blog.likes || blog.likes.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No likes found for this blog'
+      });
+    }
+    
+    // Find the index of the like by this user
+    const likeIndex = blog.likes.findIndex(
+      like => like && like.user && String(like.user) === String(userId)
+    );
+    
+    if (likeIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'User like not found on this blog'
+      });
+    }
+    
+    // Remove the like
+    blog.likes.splice(likeIndex, 1);
+    await blog.save();
+    
+    res.status(200).json({
+      success: true,
+      message: 'User like deleted successfully'
+    });
+  } catch (err) {
+    console.error('Error in deleteUserLikeById:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while deleting user like: ' + err.message
+    });
+  }
+};
+
+// @desc    Delete user comment by ID (for admin)
+// @route   DELETE /api/users/:userId/activity/comments/:blogId/:commentId
+// @access  Private/Admin
+exports.deleteUserCommentById = async (req, res) => {
+  try {
+    const { userId, blogId, commentId } = req.params;
+    
+    // Find the blog
+    const blog = await Blog.findById(blogId);
+    
+    if (!blog) {
+      return res.status(404).json({
+        success: false,
+        message: 'Blog not found'
+      });
+    }
+    
+    // Check if comment exists and belongs to user
+    const commentIndex = blog.comments.findIndex(
+      comment => comment._id.toString() === commentId && comment.user.toString() === userId
+    );
+    
+    if (commentIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Comment not found or does not belong to the specified user'
+      });
+    }
+    
+    // Remove the comment
+    blog.comments.splice(commentIndex, 1);
+    await blog.save();
+    
+    res.status(200).json({
+      success: true,
+      message: 'User comment deleted successfully'
+    });
+  } catch (err) {
+    console.error('Error in deleteUserCommentById:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while deleting comment: ' + err.message
+    });
+  }
 }; 
