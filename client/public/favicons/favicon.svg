@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <style>
+    /* Use the primary color from our theme */
+    .icon-color {
+      fill: #543A14;
+    }
+    @media (prefers-color-scheme: dark) {
+      .icon-color {
+        fill: #F0BB78;
+      }
+    }
+  </style>
+  <g class="icon-color">
+    <!-- Base horizontal beam -->
+    <rect x="20" y="40" width="60" height="5" rx="2.5" />
+    
+    <!-- Center vertical beam -->
+    <rect x="47.5" y="15" width="5" height="40" rx="2.5" />
+    
+    <!-- Top curve -->
+    <path d="M 50 15 Q 60 10 65 20 Q 55 25 50 15" />
+    
+    <!-- Left scale dish -->
+    <ellipse cx="30" cy="50" rx="10" ry="3" />
+    <path d="M 30 50 L 40 20 L 60 20 L 50 45 Z" fill-opacity="0.25" />
+    
+    <!-- Right scale dish -->
+    <ellipse cx="70" cy="50" rx="10" ry="3" />
+    <path d="M 70 50 L 60 20 L 40 20 L 50 45 Z" fill-opacity="0.25" />
+    
+    <!-- Base stand -->
+    <rect x="40" y="75" width="20" height="10" rx="3" />
+    <rect x="47.5" y="45" width="5" height="35" rx="2.5" />
+  </g>
+</svg> 
