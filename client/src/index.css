@@ -316,3 +316,225 @@ input[type="file"]::file-selector-button:hover {
 .scroll-to-top-btn:focus {
   outline: none;
 }
+
+/* Responsive Dashboard Styles */
+@media (max-width: 767px) {
+  /* General dashboard adjustments */
+  .container.py-5 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+  
+  /* Heading adjustments */
+  h1.mb-4 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  h1.mb-4 .btn {
+    margin-left: 0 !important;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.75rem;
+  }
+  
+  /* Card adjustments */
+  .card {
+    margin-bottom: 1.5rem;
+  }
+  
+  .card-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  /* Filter adjustments for admin dashboard */
+  .col-md-4.mb-3 {
+    margin-bottom: 0.75rem !important;
+  }
+  
+  .form-label {
+    margin-bottom: 0.25rem;
+  }
+  
+  .form-select, .form-control {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Table adjustments */
+  .table-responsive {
+    border: none;
+    margin-bottom: 0;
+  }
+  
+  .table th, .table td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  
+  /* Action buttons in tables */
+  .btn-group .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  /* Tab navigation */
+  .nav-tabs .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  /* Blog list container */
+  .blog-list {
+    margin-top: 1rem;
+  }
+  
+  /* Admin button stacking */
+  .admin-actions {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .admin-actions button {
+    margin-top: 0.5rem;
+    margin-left: 0 !important;
+  }
+  
+  /* Ensures buttons stack properly */
+  .btn + .btn {
+    margin-left: 0 !important;
+    margin-top: 0.5rem;
+  }
+  
+  /* For button groups, keep them inline */
+  .btn-group .btn + .btn {
+    margin-left: -1px !important;
+    margin-top: 0;
+  }
+  
+  /* Fix for table overflow */
+  .table-responsive table {
+    min-width: 650px;
+  }
+  
+  /* Blog info section */
+  .blog-info span {
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Specific Admin Dashboard Improvements */
+  .admin-actions .btn-group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  
+  /* Improve tab responsiveness */
+  .card-header-tabs {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  
+  .card-header-tabs .nav-item {
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Better table responsiveness for action columns */
+  .table td:last-child {
+    min-width: 100px;
+  }
+  
+  /* Add horizontal scrolling hint */
+  .table-responsive:before {
+    content: "← Scroll horizontally →";
+    display: block;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    opacity: 0.7;
+    padding: 0.25rem 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Adjust status badges for better visibility */
+  .badge {
+    font-size: 0.7rem;
+    padding: 0.35em 0.5em;
+  }
+  
+  /* Ensure filter row has proper spacing */
+  .row.mb-4 .col-md-9,
+  .row.mb-4 .col-md-3 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  /* Improve button display in dashboard tables */
+  .table .btn-group {
+    display: flex;
+  }
+  
+  .table .btn-group .btn {
+    flex: 1;
+    padding: 0.25rem 0.35rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+  
+  /* Ensure good spacing between filter selects on mobile */
+  .card-body .row .col-md-4:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+  
+  /* Adjusted padding for select dropdowns to save space */
+  select.form-select {
+    background-position: right 0.5rem center;
+    padding-right: 1.75rem;
+  }
+  
+  /* Better display for filter buttons */
+  .filter-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 0.75rem;
+  }
+  
+  /* Ensure reset filter button is full width on mobile */
+  .filter-buttons .btn {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+  
+  /* Ensure proper spacing between button rows */
+  .row > .col-md-3 .card .card-body .d-grid {
+    gap: 0.5rem;
+  }
+}
+
+/* Small phones */
+@media (max-width: 375px) {
+  .container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  h1.mb-4 {
+    font-size: 1.5rem;
+  }
+  
+  .table th, .table td {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+  }
+}
