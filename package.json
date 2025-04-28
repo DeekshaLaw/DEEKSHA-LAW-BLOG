@@ -1,0 +1,17 @@
+{
+  "name": "deeksha-law-blog",
+  "version": "1.0.0",
+  "description": "Deeksha Law Blogging Platform",
+  "scripts": {
+    "start": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "server": "cd server && npm run dev",
+    "deploy": "bash deploy.sh",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "render-postbuild": "npm run build && npm run deploy"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  }
+} 

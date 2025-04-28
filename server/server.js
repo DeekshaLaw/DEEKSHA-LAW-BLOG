@@ -40,16 +40,36 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // Serve static files from uploads folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
 
-// Default route
-app.get('/', (req, res) => {
-  res.send('DEEKSHA LAW API is running');
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV
+  });
 });
+
+// Serve static files from the React app in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the public directory
+  app.use(express.static(path.join(__dirname, 'public')));
+
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+} else {
+  // In development, just show a simple message
+  app.get('/', (req, res) => {
+    res.send('DEEKSHA LAW API is running in development mode');
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: deeksha-law-server
+    env: node
+    buildCommand: ./deploy.sh
+    startCommand: node server/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_EXPIRE
+        value: 30d
+    healthCheckPath: /api/health
+    autoDeploy: true 
