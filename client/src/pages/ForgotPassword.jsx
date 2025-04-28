@@ -88,7 +88,7 @@ const ForgotPassword = () => {
     
     // Validate passwords
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError('Password must be at least 8 characters long');
       return;
     }
     
@@ -223,7 +223,7 @@ const ForgotPassword = () => {
                       required
                     />
                     <small className="form-text text-muted">
-                      Password must be at least 6 characters long.
+                      Password must be at least 8 characters long.
                     </small>
                   </div>
                   <div className="mb-3">

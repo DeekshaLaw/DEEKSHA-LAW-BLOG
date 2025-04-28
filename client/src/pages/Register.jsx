@@ -54,8 +54,8 @@ const Register = () => {
     }
     
     // Validate password length
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
       setLoading(false);
       return;
     }
@@ -149,10 +149,10 @@ const Register = () => {
                     value={password}
                     onChange={onChange}
                     required
-                    minLength="6"
+                    minLength="8"
                   />
                   <small className="form-text text-muted">
-                    Password must be at least 6 characters
+                    Password must be at least 8 characters
                   </small>
                 </div>
                 

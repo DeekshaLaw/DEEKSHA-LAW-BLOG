@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const sendEmail = require('../utils/sendEmail');
+const crypto = require('crypto');
 
 // @desc    Register user
 // @route   POST /api/auth/register
@@ -81,17 +82,35 @@ exports.verifyEmail = async (req, res) => {
   try {
     const { email, otp } = req.body;
     
-    // Find user with matching token and not expired
-    const user = await User.findOne({
-      email,
-      verificationToken: otp,
-      verificationTokenExpire: { $gt: Date.now() }
-    });
+    // Find user by email
+    const user = await User.findOne({ email });
     
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid or expired OTP'
+        message: 'User not found'
+      });
+    }
+    
+    // Check if OTP is expired
+    if (user.verificationTokenExpire < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP has expired'
+      });
+    }
+    
+    // Hash the input OTP to compare with stored hash
+    const hashedOTP = crypto
+      .createHash('sha256')
+      .update(otp)
+      .digest('hex');
+    
+    // Compare hashed OTP with stored hash
+    if (hashedOTP !== user.verificationToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP'
       });
     }
     
@@ -438,10 +457,10 @@ exports.resetPassword = async (req, res) => {
     }
     
     // Validate password length
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res.status(400).json({
         success: false,
-        message: 'Password must be at least 6 characters long'
+        message: 'Password must be at least 8 characters long'
       });
     }
     
