@@ -9,9 +9,6 @@ const Home = () => {
   const [error, setError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   
-  // Get the base URL for uploads from the environment variables
-  const uploadsBaseUrl = import.meta.env.VITE_UPLOADS_URL;
-  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -100,7 +97,7 @@ const Home = () => {
               <div className="card h-100">
                 {blog.featuredImage ? (
                   <img 
-                    src={`${uploadsBaseUrl}${blog.featuredImage}`} 
+                    src={blog.featuredImage} 
                     className="card-img-top" 
                     alt={blog.title}
                     style={{ height: '200px', objectFit: 'cover' }}

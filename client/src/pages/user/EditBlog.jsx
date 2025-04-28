@@ -28,9 +28,6 @@ const EditBlog = () => {
   
   const isAdmin = user && user.role === 'admin';
   
-  // Get the base URL for uploads from the environment variables
-  const uploadsBaseUrl = import.meta.env.VITE_UPLOADS_URL;
-  
   // Fetch blog and categories on component mount
   useEffect(() => {
     const fetchData = async () => {
@@ -244,7 +241,7 @@ const EditBlog = () => {
           {currentImage && !previewUrl && (
             <div className="mb-2">
               <img 
-                src={`${uploadsBaseUrl}${currentImage}`}
+                src={currentImage}
                 alt="Current featured" 
                 className="img-thumbnail" 
                 style={{ maxHeight: '200px' }}

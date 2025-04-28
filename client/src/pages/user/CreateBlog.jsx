@@ -151,21 +151,34 @@ const CreateBlog = () => {
         blogFormData.append('featuredImage', featuredImage);
       }
       
-      // Submit blog
+      // Submit blog with progress tracking
       const res = await axios.post('/blogs', blogFormData, {
         headers: {
           'Content-Type': 'multipart/form-data'
+        },
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          console.log(`Upload progress: ${percentCompleted}%`);
         }
       });
       
-      // Redirect based on user role
-      if (isAdmin) {
-        navigate('/admin/dashboard');
+      if (res.data.success) {
+        // Redirect based on user role
+        if (isAdmin) {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/dashboard');
+        }
       } else {
-        navigate('/dashboard');
+        setError(res.data.message || 'Failed to create blog. Please try again.');
+        setLoading(false);
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create blog.');
+      if (err.code === 'ECONNABORTED') {
+        setError('Upload is taking longer than expected. Please try again with a smaller image or better internet connection.');
+      } else {
+        setError(err.response?.data?.message || 'Failed to create blog. Please try again.');
+      }
       console.error(err);
       setLoading(false);
     }

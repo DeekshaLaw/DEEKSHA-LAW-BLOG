@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 // Set axios defaults
 axios.defaults.baseURL = API_URL;
-axios.defaults.timeout = 15000;
+axios.defaults.timeout = 60000;
 
 // Add a request interceptor
 axios.interceptors.request.use(

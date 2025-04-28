@@ -20,9 +20,9 @@ const BlogDetails = () => {
   const [comment, setComment] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
-  
-  // Get the base URL for uploads from the environment variables
-  const uploadsBaseUrl = import.meta.env.VITE_UPLOADS_URL;
+  const [relatedBlogs, setRelatedBlogs] = useState([]);
+  const [loadingRelated, setLoadingRelated] = useState(true);
+  const [errorRelated, setErrorRelated] = useState('');
   
   useEffect(() => {
     const fetchBlog = async () => {
@@ -204,7 +204,7 @@ const BlogDetails = () => {
           {blog.featuredImage && (
             <div className="mb-4">
               <img 
-                src={`${uploadsBaseUrl}${blog.featuredImage}`} 
+                src={blog.featuredImage} 
                 className="img-fluid rounded" 
                 alt={blog.title}
                 loading="lazy"

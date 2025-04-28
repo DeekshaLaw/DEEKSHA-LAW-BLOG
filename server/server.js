@@ -4,13 +4,25 @@ const cors = require('cors');
 const path = require('path');
 const dotenv = require('dotenv');
 const { securityHeaders, limiter, corsOptions } = require('./middleware/security');
+const cloudinary = require('./config/cloudinary');
 
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-// Ensure JWT_SECRET is set
+// Verify Cloudinary configuration
+console.log('Cloudinary configuration:', {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY ? 'API key is set' : 'API key is missing',
+  api_secret: process.env.CLOUDINARY_API_SECRET ? 'API secret is set' : 'API secret is missing'
+});
+
+// Ensure required environment variables are set
 if (!process.env.JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required');
+}
+
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+  throw new Error('Cloudinary configuration is incomplete. Please check your .env file');
 }
 
 // Set essential environment variables if not loaded from .env
@@ -34,11 +46,8 @@ app.use(securityHeaders);
 app.use(limiter);
 
 // Body parser middleware
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-
-// Serve static files from uploads folder
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // API Routes
 app.use('/api/auth', authRoutes);

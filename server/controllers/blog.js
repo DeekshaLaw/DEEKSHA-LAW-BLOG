@@ -2,22 +2,81 @@ const Blog = require('../models/Blog');
 const Category = require('../models/Category');
 const fs = require('fs');
 const path = require('path');
+const cloudinary = require('../config/cloudinary');
 
 // @desc    Create a new blog
 // @route   POST /api/blogs
 // @access  Private
 exports.createBlog = async (req, res) => {
   try {
+    console.log('Received blog creation request');
+    console.log('Request body:', req.body);
+    console.log('Request files:', req.file);
+    console.log('User:', req.user);
+    
+    // For multipart/form-data, we need to access fields from req.body
     const { title, content, category } = req.body;
+    
+    // Log the received data
+    console.log('Extracted data:', {
+      title,
+      content: content ? 'Content present' : 'No content',
+      category,
+      hasFeaturedImage: !!req.file
+    });
+    
+    // Validate required fields
+    if (!title) {
+      console.log('Missing title');
+      return res.status(400).json({
+        success: false,
+        message: 'Title is required'
+      });
+    }
+    
+    if (!content) {
+      console.log('Missing content');
+      return res.status(400).json({
+        success: false,
+        message: 'Content is required'
+      });
+    }
+    
+    if (!category) {
+      console.log('Missing category');
+      return res.status(400).json({
+        success: false,
+        message: 'Category is required'
+      });
+    }
     
     // Check if category exists
     const categoryExists = await Category.findById(category);
     
     if (!categoryExists) {
+      console.log('Category not found:', category);
       return res.status(404).json({
         success: false,
         message: 'Category not found'
       });
+    }
+    
+    // Handle image upload to Cloudinary if present
+    let featuredImage = null;
+    if (req.file) {
+      try {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: 'deeksha-law/blogs',
+          transformation: [{ width: 1000, height: 500, crop: 'limit' }]
+        });
+        featuredImage = result.secure_url;
+      } catch (err) {
+        console.error('Error uploading image to Cloudinary:', err);
+        return res.status(500).json({
+          success: false,
+          message: 'Error uploading image'
+        });
+      }
     }
     
     // Create blog with properties from request
@@ -26,20 +85,20 @@ exports.createBlog = async (req, res) => {
       content,
       category,
       author: req.user.id,
-      featuredImage: req.featuredImage || null
+      featuredImage
     });
     
     // If admin is creating, auto-approve
     if (req.user.role === 'admin') {
       console.log('Admin creating blog - setting to approved status');
       blog.isAdmin = true;
-      blog.status = 'approved'; // Explicitly set status to approved for admin
+      blog.status = 'approved';
     }
     
     // Save the blog
     await blog.save();
     
-    console.log(`Blog created with status: ${blog.status}`);
+    console.log(`Blog created successfully with status: ${blog.status}`);
     
     res.status(201).json({
       success: true,
@@ -240,16 +299,27 @@ exports.updateBlog = async (req, res) => {
     // Handle image update
     let featuredImage = blog.featuredImage;
     
-    if (req.featuredImage) {
-      // If there was an old image, delete it
-      if (blog.featuredImage) {
-        const oldImagePath = path.join(__dirname, '..', blog.featuredImage);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
+    if (req.file) {
+      try {
+        // If there was an old image in Cloudinary, delete it
+        if (blog.featuredImage) {
+          const publicId = blog.featuredImage.split('/').pop().split('.')[0];
+          await cloudinary.uploader.destroy(`deeksha-law/blogs/${publicId}`);
         }
+        
+        // Upload new image
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: 'deeksha-law/blogs',
+          transformation: [{ width: 1000, height: 500, crop: 'limit' }]
+        });
+        featuredImage = result.secure_url;
+      } catch (err) {
+        console.error('Error updating image in Cloudinary:', err);
+        return res.status(500).json({
+          success: false,
+          message: 'Error updating image'
+        });
       }
-      
-      featuredImage = req.featuredImage;
     }
     
     // Update blog
@@ -302,11 +372,14 @@ exports.deleteBlog = async (req, res) => {
       });
     }
     
-    // Delete image if exists
+    // Delete image from Cloudinary if exists
     if (blog.featuredImage) {
-      const imagePath = path.join(__dirname, '..', blog.featuredImage);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+      try {
+        const publicId = blog.featuredImage.split('/').pop().split('.')[0];
+        await cloudinary.uploader.destroy(`deeksha-law/blogs/${publicId}`);
+      } catch (err) {
+        console.error('Error deleting image from Cloudinary:', err);
+        // Continue with blog deletion even if image deletion fails
       }
     }
     
