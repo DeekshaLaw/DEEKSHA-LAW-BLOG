@@ -29,8 +29,8 @@ const Home = () => {
         // Fetch categories
         const categoriesRes = await axios.get('/categories');
         
-        setBlogs(blogsRes.data.data);
-        setCategories(categoriesRes.data.data);
+        setBlogs(blogsRes.data?.data || []);
+        setCategories(categoriesRes.data?.data || []);
       } catch (err) {
         setError('Failed to load blogs. Please try again.');
         console.error(err);
@@ -75,7 +75,7 @@ const Home = () => {
               onChange={handleCategoryChange}
             >
               <option value="">All Categories</option>
-              {categories.map(category => (
+              {Array.isArray(categories) && categories.map(category => (
                 <option key={category._id} value={category._id}>
                   {category.name}
                 </option>
@@ -85,14 +85,14 @@ const Home = () => {
         </div>
       </div>
       
-      {blogs.length === 0 ? (
+      {(!blogs || blogs.length === 0) ? (
         <div className="text-center py-5">
           <h3>No blogs found</h3>
           <p>There are no published blogs in this category yet.</p>
         </div>
       ) : (
         <div className="row">
-          {blogs.map(blog => (
+          {Array.isArray(blogs) && blogs.map(blog => (
             <div key={blog._id} className="col-md-4 mb-4">
               <div className="card h-100">
                 {blog.featuredImage ? (
@@ -117,7 +117,7 @@ const Home = () => {
                   <h5 className="card-title">{blog.title}</h5>
                   <p className="card-text text-muted">
                     <small>
-                      Category: {blog.category.name} | By: {blog.author.name}
+                      Category: {blog.category?.name || 'Uncategorized'} | By: {blog.author?.name || 'Unknown'}
                     </small>
                   </p>
                   <Link to={`/blogs/${blog._id}`} className="btn btn-primary">
@@ -127,8 +127,8 @@ const Home = () => {
                 <div className="card-footer text-muted">
                   <small>
                     {new Date(blog.createdAt).toLocaleDateString()} | 
-                    <i className="bi bi-heart-fill ms-2 me-1"></i> {blog.likeCount} |
-                    <i className="bi bi-chat-fill ms-2 me-1"></i> {blog.commentCount}
+                    <i className="bi bi-heart-fill ms-2 me-1"></i> {blog.likeCount || 0} |
+                    <i className="bi bi-chat-fill ms-2 me-1"></i> {blog.commentCount || 0}
                   </small>
                 </div>
               </div>
