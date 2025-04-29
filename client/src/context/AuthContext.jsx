@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../config/axios';
 import { jwtDecode } from 'jwt-decode';
 
 // Create the context
@@ -50,80 +50,34 @@ export const AuthProvider = ({ children }) => {
         // Set auth token header
         setAuthToken(token);
         
-        // Decode the token to check user role
-        const decoded = jwtDecode(token);
-        console.log("Token decoded in loadUser:", decoded);
-        
-        // Check if admin role is in the token
-        if (decoded && decoded.role === 'admin') {
-          console.log("Admin role detected in token");
-          // For admin users, fetch admin profile
-          const res = await axios.get('/auth/me');
-          console.log("Admin user profile loaded:", res.data);
-          setUser(res.data.data);
-          setIsAuthenticated(true);
-        } else {
-          console.log("Regular user role in token");
-          // For regular users
-          const res = await axios.get('/auth/me');
-          console.log("User profile loaded:", res.data);
-          setUser(res.data.data);
-          setIsAuthenticated(true);
-        }
+        // Get user data
+        const res = await axios.get('/auth/me');
+        setUser(res.data.data);
+        setIsAuthenticated(true);
       } else {
-        // Clear token if expired
         console.log("Token is expired or missing, clearing auth state");
-        setAuthToken(null);
         setToken(null);
         setUser(null);
         setIsAuthenticated(false);
+        setAuthToken(null);
       }
     } catch (err) {
-      console.error("Error in loadUser:", err);
-      setAuthToken(null);
+      console.error('Error loading user:', err);
       setToken(null);
       setUser(null);
       setIsAuthenticated(false);
+      setAuthToken(null);
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   // Register user
   const register = async (formData) => {
     try {
-      setError(null);
       const res = await axios.post('/auth/register', formData);
       return res.data;
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred during registration');
-      throw err;
-    }
-  };
-
-  // Verify email with OTP
-  const verifyEmail = async (formData) => {
-    try {
-      setError(null);
-      const res = await axios.post('/auth/verify', formData);
-      setToken(res.data.token);
-      setAuthToken(res.data.token);
-      await loadUser();
-      return res.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Invalid or expired OTP');
-      throw err;
-    }
-  };
-
-  // Resend verification email
-  const resendVerification = async (email) => {
-    try {
-      setError(null);
-      const res = await axios.post('/auth/resend-verification', { email });
-      return res.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Error sending verification email');
       throw err;
     }
   };
@@ -131,149 +85,66 @@ export const AuthProvider = ({ children }) => {
   // Login user
   const login = async (formData) => {
     try {
-      setError(null);
-      console.log("Login attempt with:", formData.email);
-      
-      // Validate inputs before sending request
-      if (!formData.email || !formData.password) {
-        setError('Email and password are required');
-        throw new Error('Email and password are required');
-      }
-      
       const res = await axios.post('/auth/login', formData);
-      console.log("Login response:", res.data);
-      
-      // Check if token is present in response
-      if (!res.data.token) {
-        console.error("No token received in login response");
-        setError('Authentication failed - no token received');
-        throw new Error("Authentication failed - no token received");
-      }
-      
-      // Try to decode the token to verify it has the right structure
-      try {
-        const decoded = jwtDecode(res.data.token);
-        
-        // Validate token structure
-        if (!decoded || typeof decoded !== 'object' || !decoded.id) {
-          console.error("Invalid token structure:", decoded);
-          setError('Invalid authentication token received');
-          throw new Error('Invalid authentication token structure');
-        }
-        
-        console.log("Decoded token:", decoded);
-        
-        // Store token in localStorage first
-        localStorage.setItem('token', res.data.token);
-        
-        // Set token in state and axios headers
-        setToken(res.data.token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
-        
-        // Set user data directly from the login response
-        setUser(res.data.user);
-        setIsAuthenticated(true);
-        setLoading(false);
-      } catch (decodeErr) {
-        console.error("Token decode error:", decodeErr);
-        setError('Invalid authentication token');
-        throw decodeErr;
-      }
-      
+      setToken(res.data.token);
+      setAuthToken(res.data.token);
+      await loadUser();
       return res.data;
     } catch (err) {
-      console.error("Login error:", err);
-      setError(err.response?.data?.message || 'Invalid credentials');
       throw err;
     }
   };
 
   // Logout user
   const logout = () => {
-    setAuthToken(null);
     setToken(null);
     setUser(null);
     setIsAuthenticated(false);
+    setAuthToken(null);
   };
 
   // Update user profile
   const updateProfile = async (formData) => {
     try {
-      setError(null);
       const res = await axios.put('/users/profile', formData);
       setUser(res.data.data);
       return res.data;
     } catch (err) {
-      setError(err.response?.data?.message || 'Error updating profile');
       throw err;
     }
   };
 
-  // Forgot Password - Send reset OTP
+  // Forgot password
   const forgotPassword = async (email) => {
     try {
-      setError(null);
-      
-      // Create a clean axios instance without auth headers for this request
-      const axiosInstance = axios.create({
-        baseURL: axios.defaults.baseURL
-      });
-      
-      // Make API call without authorization header
-      const res = await axiosInstance.post('/auth/forgot-password', { email });
-      
+      const res = await axios.post('/auth/forgot-password', { email });
       return res.data;
     } catch (err) {
-      setError(err.response?.data?.message || 'Error processing password reset request');
       throw err;
     }
   };
 
-  // Reset Password with OTP
+  // Reset password
   const resetPassword = async ({ email, otp, password }) => {
     try {
-      setError(null);
-      
-      // Create a clean axios instance without auth headers for this request
-      const axiosInstance = axios.create({
-        baseURL: axios.defaults.baseURL
-      });
-      
-      // Make API call without authorization header
-      const res = await axiosInstance.post('/auth/reset-password', { 
-        email, 
-        otp, 
-        password 
-      });
-      
+      const res = await axios.post('/auth/reset-password', { email, otp, password });
       return res.data;
     } catch (err) {
-      setError(err.response?.data?.message || 'Error resetting password');
       throw err;
     }
   };
 
-  // Verify Reset Password OTP
+  // Verify reset OTP
   const verifyResetOTP = async ({ email, otp }) => {
     try {
-      setError(null);
-      
-      // Create a clean axios instance without auth headers for this request
-      const axiosInstance = axios.create({
-        baseURL: axios.defaults.baseURL
-      });
-      
-      // Make API call without authorization header
-      const res = await axiosInstance.post('/auth/verify-reset-otp', { email, otp });
-      
+      const res = await axios.post('/auth/verify-reset-otp', { email, otp });
       return res.data;
     } catch (err) {
-      setError(err.response?.data?.message || 'Error verifying OTP');
       throw err;
     }
   };
 
-  // Load user when token changes
+  // Load user on mount and when token changes
   useEffect(() => {
     loadUser();
   }, [token]);
@@ -281,14 +152,12 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
-        token,
         user,
+        token,
         isAuthenticated,
         loading,
         error,
         register,
-        verifyEmail,
-        resendVerification,
         login,
         logout,
         updateProfile,

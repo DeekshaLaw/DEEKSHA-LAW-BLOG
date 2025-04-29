@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
-import axios from 'axios';
+import axios from '../config/axios';
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -57,9 +57,9 @@ const AdminLogin = () => {
     <div className="container py-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <div className="card border-danger">
-            <div className="card-header bg-danger text-white">
-              <h2 className="text-center mb-0">Admin Login</h2>
+          <div className="card">
+            <div className="card-header">
+              <h3 className="text-center mb-0">Admin Login</h3>
             </div>
             <div className="card-body">
               {error && (
@@ -70,11 +70,11 @@ const AdminLogin = () => {
               
               <form onSubmit={onSubmit}>
                 <div className="mb-3">
-                  <label htmlFor="email" className="form-label">Admin Email</label>
-                  <input 
-                    type="email" 
-                    className="form-control" 
-                    id="email" 
+                  <label htmlFor="email" className="form-label">Email</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="email"
                     name="email"
                     value={email}
                     onChange={onChange}
@@ -84,10 +84,10 @@ const AdminLogin = () => {
                 
                 <div className="mb-3">
                   <label htmlFor="password" className="form-label">Password</label>
-                  <input 
-                    type="password" 
-                    className="form-control" 
-                    id="password" 
+                  <input
+                    type="password"
+                    className="form-control"
+                    id="password"
                     name="password"
                     value={password}
                     onChange={onChange}
@@ -95,20 +95,19 @@ const AdminLogin = () => {
                   />
                 </div>
                 
-                <button 
-                  type="submit" 
-                  className="btn btn-danger w-100"
-                  disabled={loading}
-                >
-                  {loading ? 'Logging in...' : 'Admin Login'}
-                </button>
+                <div className="d-grid">
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    ) : null}
+                    Login
+                  </button>
+                </div>
               </form>
-              
-              <div className="mt-3 text-center">
-                <p className="text-muted">
-                  <small>This login is for administrators only</small>
-                </p>
-              </div>
             </div>
           </div>
         </div>
