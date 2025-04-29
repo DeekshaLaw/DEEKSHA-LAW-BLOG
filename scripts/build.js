@@ -42,11 +42,8 @@ async function build() {
     process.exit(1);
   }
 
-  // Copy files
-  const copyCommand = isProduction
-    ? `cp -r ${distDir}/* ${publicDir}/`
-    : `xcopy /E /I /Y "${distDir}\\*" "${publicDir}"`;
-
+  // Use cp command for both environments
+  const copyCommand = `cp -r ${distDir}/* ${publicDir}/`;
   runCommand(copyCommand);
 
   console.log('Build completed successfully!');
