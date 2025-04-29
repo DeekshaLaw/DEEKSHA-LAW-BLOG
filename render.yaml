@@ -2,11 +2,7 @@ services:
   - type: web
     name: deeksha-law
     env: node
-    buildCommand: |
-      npm run install:all
-      cd client && npm run build
-      mkdir -p ../server/public
-      cp -r dist/* ../server/public/
+    buildCommand: npm run build
     startCommand: cd server && npm start
     envVars:
       - key: NODE_ENV
