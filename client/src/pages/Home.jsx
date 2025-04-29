@@ -97,7 +97,7 @@ const Home = () => {
               <div className="card h-100">
                 {blog.featuredImage ? (
                   <img 
-                    src={`http://localhost:5000${blog.featuredImage}`} 
+                    src={blog.featuredImage.startsWith('http') ? blog.featuredImage : `http://localhost:5000${blog.featuredImage}`}
                     className="card-img-top" 
                     alt={blog.title}
                     style={{ height: '200px', objectFit: 'cover' }}

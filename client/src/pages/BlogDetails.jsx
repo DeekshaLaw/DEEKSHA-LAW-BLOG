@@ -210,7 +210,7 @@ const BlogDetails = () => {
           {blog.featuredImage && (
             <div className="mb-4">
               <img 
-                src={`http://localhost:5000${blog.featuredImage}`} 
+                src={blog.featuredImage.startsWith('http') ? blog.featuredImage : `http://localhost:5000${blog.featuredImage}`}
                 className="img-fluid rounded" 
                 alt={blog.title}
               />

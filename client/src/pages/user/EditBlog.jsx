@@ -242,7 +242,7 @@ const EditBlog = () => {
           {currentImage && !previewUrl && (
             <div className="mb-2">
               <img 
-                src={`http://localhost:5000${currentImage}`}
+                src={currentImage.startsWith('http') ? currentImage : `http://localhost:5000${currentImage}`}
                 alt="Current featured" 
                 className="img-thumbnail" 
                 style={{ maxHeight: '200px' }}

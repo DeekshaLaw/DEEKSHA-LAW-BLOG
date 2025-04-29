@@ -1,7 +1,23 @@
 const Blog = require('../models/Blog');
 const Category = require('../models/Category');
+const cloudinary = require('../config/cloudinary');
 const fs = require('fs');
 const path = require('path');
+
+// Helper function to check if a URL is from Cloudinary
+const isCloudinaryUrl = (url) => {
+  return url && (url.includes('cloudinary.com') || url.startsWith('http'));
+};
+
+// Helper function to delete old image if it's a local file
+const deleteLocalImage = (imagePath) => {
+  if (imagePath && !isCloudinaryUrl(imagePath)) {
+    const fullPath = path.join(__dirname, '..', imagePath);
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+    }
+  }
+};
 
 // @desc    Create a new blog
 // @route   POST /api/blogs
@@ -33,7 +49,7 @@ exports.createBlog = async (req, res) => {
     if (req.user.role === 'admin') {
       console.log('Admin creating blog - setting to approved status');
       blog.isAdmin = true;
-      blog.status = 'approved'; // Explicitly set status to approved for admin
+      blog.status = 'approved';
     }
     
     // Save the blog
@@ -214,13 +230,11 @@ exports.updateBlog = async (req, res) => {
     
     // Handle status based on user role
     if (req.user.role === 'admin') {
-      // Admin can set any status, but if no status is provided, keep it as approved
       if (!req.body.status) {
         req.body.status = 'approved';
       }
       console.log(`Admin updating blog - setting status to ${req.body.status}`);
     } else {
-      // If regular user updates, reset status to pending
       req.body.status = 'pending';
       console.log('Regular user updating blog - resetting to pending status');
     }
@@ -241,12 +255,9 @@ exports.updateBlog = async (req, res) => {
     let featuredImage = blog.featuredImage;
     
     if (req.featuredImage) {
-      // If there was an old image, delete it
+      // If there was an old image, delete it if it's a local file
       if (blog.featuredImage) {
-        const oldImagePath = path.join(__dirname, '..', blog.featuredImage);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
+        deleteLocalImage(blog.featuredImage);
       }
       
       featuredImage = req.featuredImage;
@@ -304,9 +315,13 @@ exports.deleteBlog = async (req, res) => {
     
     // Delete image if exists
     if (blog.featuredImage) {
-      const imagePath = path.join(__dirname, '..', blog.featuredImage);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+      // If it's a local file, delete it
+      deleteLocalImage(blog.featuredImage);
+      
+      // If it's a Cloudinary image, delete it from Cloudinary
+      if (isCloudinaryUrl(blog.featuredImage)) {
+        const publicId = blog.featuredImage.split('/').pop().split('.')[0];
+        await cloudinary.uploader.destroy(`blog-featured-images/${publicId}`);
       }
     }
     
