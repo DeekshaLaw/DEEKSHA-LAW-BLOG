@@ -56,12 +56,24 @@ exports.corsOptions = {
     if (!origin) return callback(null, true);
     
     const allowedOrigins = process.env.NODE_ENV === 'production' 
-      ? ['https://deekshalaw.com', 'https://www.deekshalaw.com']
-      : ['http://localhost:5173', 'http://127.0.0.1:5173'];
+      ? [
+          'https://deekshalaw.com',
+          'https://www.deekshalaw.com',
+          'https://deeksha-law.onrender.com',
+          'http://deeksha-law.onrender.com',
+          'https://deeksha-law-blog.onrender.com'
+        ]
+      : [
+          'http://localhost:5173',
+          'http://127.0.0.1:5173',
+          'http://localhost:5000',
+          'http://127.0.0.1:5000'
+        ];
     
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log('CORS blocked origin:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -71,7 +83,8 @@ exports.corsOptions = {
     'Authorization',
     'X-Requested-With',
     'Accept',
-    'Origin'
+    'Origin',
+    'Access-Control-Allow-Origin'
   ],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
   credentials: true,
