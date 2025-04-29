@@ -55,7 +55,7 @@ const uploadMiddleware = (req, res, next) => {
     }
   }).single('featuredImage');
 
-  upload(req, res, (err) => {
+  upload(req, res, async (err) => {
     if (err instanceof multer.MulterError) {
       console.error('Multer error:', err);
       // Handle specific Multer errors
@@ -85,10 +85,22 @@ const uploadMiddleware = (req, res, next) => {
 
     console.log('File upload successful:', req.file);
     
-    // If file was uploaded successfully, the Cloudinary URL will be in req.file.path
+    // If file was uploaded successfully, verify the Cloudinary URL
     if (req.file) {
-      console.log('Setting featuredImage to:', req.file.path);
-      req.featuredImage = req.file.path; // This will be the Cloudinary URL
+      try {
+        // Verify the URL is a valid Cloudinary URL
+        if (!req.file.path.startsWith('https://res.cloudinary.com')) {
+          throw new Error('Invalid Cloudinary URL received');
+        }
+        console.log('Setting featuredImage to:', req.file.path);
+        req.featuredImage = req.file.path;
+      } catch (error) {
+        console.error('Error verifying Cloudinary URL:', error);
+        return res.status(500).json({
+          success: false,
+          message: 'Error processing uploaded image'
+        });
+      }
     } else {
       console.log('No file was uploaded');
     }

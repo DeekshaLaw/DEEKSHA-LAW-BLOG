@@ -69,12 +69,19 @@ exports.createBlog = async (req, res) => {
           folder: 'deeksha-law/blogs',
           transformation: [{ width: 1000, height: 500, crop: 'limit' }]
         });
+        
+        // Verify the upload was successful
+        if (!result || !result.secure_url) {
+          throw new Error('Cloudinary upload failed - no secure URL returned');
+        }
+        
         featuredImage = result.secure_url;
+        console.log('Image uploaded successfully to Cloudinary:', featuredImage);
       } catch (err) {
         console.error('Error uploading image to Cloudinary:', err);
         return res.status(500).json({
           success: false,
-          message: 'Error uploading image'
+          message: 'Error uploading image to Cloudinary. Please try again.'
         });
       }
     }
@@ -305,6 +312,7 @@ exports.updateBlog = async (req, res) => {
         if (blog.featuredImage) {
           const publicId = blog.featuredImage.split('/').pop().split('.')[0];
           await cloudinary.uploader.destroy(`deeksha-law/blogs/${publicId}`);
+          console.log('Old image deleted from Cloudinary');
         }
         
         // Upload new image
@@ -312,12 +320,19 @@ exports.updateBlog = async (req, res) => {
           folder: 'deeksha-law/blogs',
           transformation: [{ width: 1000, height: 500, crop: 'limit' }]
         });
+        
+        // Verify the upload was successful
+        if (!result || !result.secure_url) {
+          throw new Error('Cloudinary upload failed - no secure URL returned');
+        }
+        
         featuredImage = result.secure_url;
+        console.log('New image uploaded successfully to Cloudinary:', featuredImage);
       } catch (err) {
         console.error('Error updating image in Cloudinary:', err);
         return res.status(500).json({
           success: false,
-          message: 'Error updating image'
+          message: 'Error updating image in Cloudinary. Please try again.'
         });
       }
     }
@@ -377,6 +392,7 @@ exports.deleteBlog = async (req, res) => {
       try {
         const publicId = blog.featuredImage.split('/').pop().split('.')[0];
         await cloudinary.uploader.destroy(`deeksha-law/blogs/${publicId}`);
+        console.log('Image deleted successfully from Cloudinary');
       } catch (err) {
         console.error('Error deleting image from Cloudinary:', err);
         // Continue with blog deletion even if image deletion fails
