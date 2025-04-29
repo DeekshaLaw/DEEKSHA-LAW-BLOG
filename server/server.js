@@ -67,21 +67,11 @@ app.get('/api/health', (req, res) => {
 // Serve static files from the React app in production
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the public directory
-  const publicPath = path.join(__dirname, 'public');
-  console.log('Serving static files from:', publicPath);
-  
-  app.use(express.static(publicPath));
+  app.use(express.static(path.join(__dirname, 'public')));
 
   // Handle React routing, return all requests to React app
   app.get('*', (req, res) => {
-    const indexPath = path.join(publicPath, 'index.html');
-    console.log('Attempting to serve index.html from:', indexPath);
-    res.sendFile(indexPath, (err) => {
-      if (err) {
-        console.error('Error serving index.html:', err);
-        res.status(500).send('Error serving the application');
-      }
-    });
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
   });
 } else {
   // In development, just show a simple message
