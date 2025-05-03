@@ -9,10 +9,12 @@ COPY client/package*.json ./
 # Install client dependencies
 RUN npm install
 
-# Copy client source code
+# Copy client source code and .env file
 COPY client/ .
 
-# Build the React app
+# Build the React app with environment variables
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL:-https://deeksha-law-blog.onrender.com/api}
 RUN npm run build
 
 # Build stage for the Express backend
