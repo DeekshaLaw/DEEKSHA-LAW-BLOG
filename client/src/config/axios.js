@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 // Set default base URL for all requests
-axios.defaults.baseURL = 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+axios.defaults.baseURL = API_URL;
 
 // Set a reasonable timeout value
 axios.defaults.timeout = 15000;
