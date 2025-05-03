@@ -34,13 +34,23 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/users', userRoutes);
 
-// Default route
-app.get('/', (req, res) => {
-  res.send('DEEKSHA LAW API is running');
-});
+// Serve static files from the React app
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, 'public')));
+  
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
+} else {
+  // Default route for development
+  app.get('/', (req, res) => {
+    res.send('DEEKSHA LAW API is running');
+  });
+}
 
 // Connect to MongoDB
-const MONGO_URI = "mongodb+srv://harsharsm007:6UWJEOyssPqbuzyx@deekshalawblog.axpqkdx.mongodb.net/?retryWrites=true&w=majority&appName=DEEKSHALAWBLOG";
+const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://harsharsm007:6UWJEOyssPqbuzyx@deekshalawblog.axpqkdx.mongodb.net/?retryWrites=true&w=majority&appName=DEEKSHALAWBLOG";
 const PORT = process.env.PORT || 5000;
 
 console.log("MongoDB URI:", MONGO_URI);
