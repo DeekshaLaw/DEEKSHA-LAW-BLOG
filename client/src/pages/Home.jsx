@@ -116,7 +116,8 @@ const Home = () => {
                   <h5 className="card-title">{blog.title}</h5>
                   <p className="card-text text-muted">
                     <small>
-                      Category: {blog.category.name} | By: {blog.author.name}
+                      Category: {blog.category?.name || 'Uncategorized'} | 
+                      By: {blog.author?.name || 'Deleted User'}
                     </small>
                   </p>
                   <Link to={`/blogs/${blog._id}`} className="btn btn-primary">
@@ -126,8 +127,8 @@ const Home = () => {
                 <div className="card-footer text-muted">
                   <small>
                     {new Date(blog.createdAt).toLocaleDateString()} | 
-                    <i className="bi bi-heart-fill ms-2 me-1"></i> {blog.likeCount} |
-                    <i className="bi bi-chat-fill ms-2 me-1"></i> {blog.commentCount}
+                    <i className="bi bi-heart-fill ms-2 me-1"></i> {blog.likeCount || 0} |
+                    <i className="bi bi-chat-fill ms-2 me-1"></i> {blog.commentCount || 0}
                   </small>
                 </div>
               </div>

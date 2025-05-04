@@ -113,18 +113,21 @@ exports.getBlogs = async (req, res) => {
     
     console.log('Final query:', query);
     
-    // Get blogs
+    // Get blogs with populated author and category
     const blogs = await Blog.find(query)
       .populate('category', 'name')
       .populate('author', 'name')
       .sort({ createdAt: -1 });
+
+    // Filter out blogs where author is null (deleted)
+    const validBlogs = blogs.filter(blog => blog.author !== null);
     
-    console.log(`Found ${blogs.length} blogs matching criteria`);
+    console.log(`Found ${validBlogs.length} valid blogs matching criteria`);
     
     res.status(200).json({
       success: true,
-      count: blogs.length,
-      data: blogs
+      count: validBlogs.length,
+      data: validBlogs
     });
   } catch (err) {
     console.error('Error in getBlogs:', err);
@@ -426,9 +429,13 @@ exports.addComment = async (req, res) => {
     
     await blog.save();
     
+    // Populate the user data before sending response
+    const updatedBlog = await Blog.findById(req.params.id)
+      .populate('comments.user', 'name');
+    
     res.status(200).json({
       success: true,
-      data: blog.comments
+      data: updatedBlog.comments
     });
   } catch (err) {
     res.status(500).json({

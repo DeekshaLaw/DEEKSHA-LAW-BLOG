@@ -120,7 +120,23 @@ exports.deleteUser = async (req, res) => {
         message: 'User not found'
       });
     }
+
+    // Delete all blogs associated with this user
+    await Blog.deleteMany({ author: req.params.id });
     
+    // Remove user's likes from all blogs
+    await Blog.updateMany(
+      { 'likes.user': req.params.id },
+      { $pull: { likes: { user: req.params.id } } }
+    );
+    
+    // Remove user's comments from all blogs
+    await Blog.updateMany(
+      { 'comments.user': req.params.id },
+      { $pull: { comments: { user: req.params.id } } }
+    );
+    
+    // Delete the user
     await User.findByIdAndDelete(req.params.id);
     
     res.status(200).json({

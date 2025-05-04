@@ -161,8 +161,8 @@ const BlogDetails = () => {
     return null;
   }
   
-  const isLikedByUser = blog.likes.some(
-    like => user && like.user === user.id
+  const isLikedByUser = blog.likes?.some(
+    like => user && like?.user === user.id
   );
   
   // Sanitize blog content with DOMPurify
@@ -191,7 +191,8 @@ const BlogDetails = () => {
           <h1 className="mb-3">{blog.title}</h1>
           <p className="text-muted">
             <span>
-              Category: {blog.category.name} | Author: {blog.author.name}
+              Category: {blog.category?.name || 'Uncategorized'} | 
+              Author: {blog.author?.name || 'Deleted User'}
             </span>
             <span className="ms-3">
               {new Date(blog.createdAt).toLocaleDateString()}
@@ -208,87 +209,86 @@ const BlogDetails = () => {
           
           {/* Featured image */}
           {blog.featuredImage && (
-            <div className="mb-4">
-              <img 
-                src={blog.featuredImage.startsWith('http') ? blog.featuredImage : `http://localhost:5000${blog.featuredImage}`}
-                className="img-fluid rounded" 
-                alt={blog.title}
-              />
-            </div>
+            <img 
+              src={blog.featuredImage.startsWith('http') ? blog.featuredImage : `http://localhost:5000${blog.featuredImage}`}
+              className="img-fluid rounded mb-4"
+              alt={blog.title}
+            />
           )}
           
           {/* Blog content */}
-          <div className="blog-content mb-5">
-            <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
-          </div>
+          <div 
+            className="blog-content mb-4"
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+          />
           
           {/* Like button */}
           <div className="mb-4">
             <button 
-              className={`btn ${isLikedByUser ? 'btn-danger' : 'btn-outline-danger'}`}
+              className={`btn ${isLikedByUser ? 'btn-primary' : 'btn-outline-primary'}`}
               onClick={handleLike}
-              disabled={likeLoading || !isAuthenticated}
+              disabled={likeLoading}
             >
-              <i className="bi bi-heart-fill me-1"></i>
-              {isLikedByUser ? 'Liked' : 'Like'} ({blog.likes.length})
+              {likeLoading ? (
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              ) : (
+                <i className="bi bi-heart-fill me-2"></i>
+              )}
+              {isLikedByUser ? 'Liked' : 'Like'} ({blog.likes?.length || 0})
             </button>
-            
-            {!isAuthenticated && (
-              <small className="text-muted ms-2">
-                Please <a href="/login">login</a> to like this blog.
-              </small>
-            )}
           </div>
           
           {/* Comments section */}
-          <div className="mt-5">
-            <h3 className="mb-4">Comments ({blog.comments.length})</h3>
+          <div className="comments-section">
+            <h4>Comments ({blog.comments?.length || 0})</h4>
             
             {/* Comment form */}
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <form onSubmit={handleCommentSubmit} className="mb-4">
                 <div className="mb-3">
-                  <textarea 
-                    className="form-control" 
-                    rows="3" 
-                    placeholder="Leave a comment..." 
+                  <textarea
+                    className="form-control"
+                    rows="3"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    required
-                  ></textarea>
+                    placeholder="Write a comment..."
+                    disabled={commentLoading}
+                  />
                 </div>
                 <button 
                   type="submit" 
-                  className="btn btn-primary" 
-                  disabled={commentLoading}
+                  className="btn btn-primary"
+                  disabled={commentLoading || !comment.trim()}
                 >
-                  {commentLoading ? 'Posting...' : 'Post Comment'}
+                  {commentLoading ? (
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  ) : (
+                    'Post Comment'
+                  )}
                 </button>
               </form>
-            ) : (
-              <div className="alert alert-info mb-4">
-                Please <a href="/login">login</a> to comment on this blog.
-              </div>
             )}
             
             {/* Comments list */}
-            {blog.comments.length === 0 ? (
-              <p className="text-muted">No comments yet. Be the first to comment!</p>
-            ) : (
-              <div className="comments-list">
-                {blog.comments.map((comment, index) => (
-                  <div key={index} className="card mb-3">
-                    <div className="card-body">
-                      <h5 className="card-title">{comment.name}</h5>
-                      <h6 className="card-subtitle mb-2 text-muted">
-                        {new Date(comment.date).toLocaleDateString()}
-                      </h6>
-                      <p className="card-text">{comment.comment}</p>
-                    </div>
+            <div className="comments-list">
+              {blog.comments?.map(comment => (
+                <div key={comment._id} className="card mb-3">
+                  <div className="card-body">
+                    <p className="card-text">{comment.comment}</p>
+                    <p className="card-text">
+                      <small className="text-muted">
+                        By: {comment.user?.name || 'Deleted User'} | 
+                        {comment.date ? new Date(comment.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }) : 'Date not available'}
+                      </small>
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
