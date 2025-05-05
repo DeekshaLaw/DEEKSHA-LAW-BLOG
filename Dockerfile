@@ -14,7 +14,7 @@ COPY client/ .
 
 # Build the React app with environment variables
 ARG VITE_API_URL
-ENV VITE_API_URL=${VITE_API_URL:-https://deeksha-law-blog.onrender.com/api}
+ENV VITE_API_URL=${VITE_API_URL:-https://deeksha-law-blog-d09x.onrender.com/api}
 RUN npm run build
 
 # Build stage for the Express backend
