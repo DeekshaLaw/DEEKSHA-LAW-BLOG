@@ -25,7 +25,9 @@ const corsOptions = {
   origin: [
     'http://localhost:5173', 
     'https://deeksha-law-blog-d09x.onrender.com',
-    'https://deeksha-law-blog.onrender.com'
+    'https://deeksha-law-blog.onrender.com',
+    'https://deekshalaw.in',
+    'https://www.deekshalaw.in'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
