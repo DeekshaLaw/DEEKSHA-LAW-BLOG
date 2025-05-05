@@ -43,50 +43,32 @@ export const AuthProvider = ({ children }) => {
 
   // Load user with token
   const loadUser = async () => {
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      setUser(null);
+      setIsAuthenticated(false);
+      return;
+    }
+    
     try {
-      console.log("loadUser called, token:", token ? "exists" : "none");
+      const decoded = jwtDecode(token);
       
-      if (token && !isTokenExpired(token)) {
-        // Set auth token header
-        setAuthToken(token);
-        
-        // Decode the token to check user role
-        const decoded = jwtDecode(token);
-        console.log("Token decoded in loadUser:", decoded);
-        
-        // Check if admin role is in the token
-        if (decoded && decoded.role === 'admin') {
-          console.log("Admin role detected in token");
-          // For admin users, fetch admin profile
-          const res = await axios.get('/auth/me');
-          console.log("Admin user profile loaded:", res.data);
-          setUser(res.data.data);
-          setIsAuthenticated(true);
-        } else {
-          console.log("Regular user role in token");
-          // For regular users
-          const res = await axios.get('/auth/me');
-          console.log("User profile loaded:", res.data);
-          setUser(res.data.data);
-          setIsAuthenticated(true);
-        }
+      if (decoded.role === 'admin') {
+        const res = await axios.get('/users/admin/profile');
+        setUser(res.data.data);
       } else {
-        // Clear token if expired
-        console.log("Token is expired or missing, clearing auth state");
-        setAuthToken(null);
-        setToken(null);
-        setUser(null);
-        setIsAuthenticated(false);
+        const res = await axios.get('/users/profile');
+        setUser(res.data.data);
       }
+      
+      setIsAuthenticated(true);
     } catch (err) {
-      console.error("Error in loadUser:", err);
-      setAuthToken(null);
-      setToken(null);
+      console.error('Error loading user:', err);
+      localStorage.removeItem('token');
       setUser(null);
       setIsAuthenticated(false);
     }
-    
-    setLoading(false);
   };
 
   // Register user

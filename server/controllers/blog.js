@@ -75,29 +75,20 @@ exports.createBlog = async (req, res) => {
 // @access  Public/Private
 exports.getBlogs = async (req, res) => {
   try {
-    console.log('getBlogs request from:', req.user ? `User ${req.user.name} (${req.user.role})` : 'Unauthenticated user');
-    console.log('Query parameters:', req.query);
-    
     let query = {};
     
     // If not logged in or not admin, only show approved blogs
     if (!req.user || req.user.role !== 'admin') {
-      console.log('Restricting to approved blogs only');
       query.status = 'approved';
     } else {
-      console.log('Admin user, showing all blogs or filtering by status');
       // For admin users, if status filter is provided and not empty, use it
       if (req.query.status) {
-        console.log(`Admin filtered by status: ${req.query.status}`);
         query.status = req.query.status;
       } else if (req.query.status === '') {
         // Empty string means "All Statuses" was selected - don't filter by status
-        console.log('Admin selected "All Statuses" - showing all status types');
-        // No status filter added to query, so all statuses will be included
       } else {
         // If status parameter is not present (default case), show approved blogs
         query.status = 'approved';
-        console.log('Admin without status parameter - defaulting to approved blogs');
       }
     }
     
@@ -111,8 +102,6 @@ exports.getBlogs = async (req, res) => {
       query.author = req.query.author;
     }
     
-    console.log('Final query:', query);
-    
     // Get blogs with populated author and category
     const blogs = await Blog.find(query)
       .populate('category', 'name')
@@ -121,8 +110,6 @@ exports.getBlogs = async (req, res) => {
 
     // Filter out blogs where author is null (deleted)
     const validBlogs = blogs.filter(blog => blog.author !== null);
-    
-    console.log(`Found ${validBlogs.length} valid blogs matching criteria`);
     
     res.status(200).json({
       success: true,

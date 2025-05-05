@@ -28,6 +28,7 @@ const corsOptions = {
     'https://deeksha-law-blog.onrender.com',
     'https://deekshalaw.in',
     'https://www.deekshalaw.in'
+    'deekshalaw.in'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -66,8 +67,6 @@ if (process.env.NODE_ENV === 'production') {
 // Connect to MongoDB
 const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://deekshalaw314:hkdA7jShyPx7Dspv@deeksha-law.dl65cnb.mongodb.net/?retryWrites=true&w=majority&appName=deeksha-law";
 const PORT = process.env.PORT || 5000;
-
-console.log("MongoDB URI:", MONGO_URI);
 
 mongoose
   .connect(MONGO_URI)

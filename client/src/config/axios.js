@@ -2,7 +2,6 @@ import axios from 'axios';
 
 // Set default base URL for all requests
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-console.log('Using API URL:', API_URL); // Debug log
 axios.defaults.baseURL = API_URL;
 
 // Set a reasonable timeout value
@@ -17,9 +16,6 @@ axios.interceptors.request.use(
     // If token exists, add to headers
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log(`Request to ${config.url}: Token attached`);
-    } else {
-      console.log(`Request to ${config.url}: No auth token available`);
     }
     
     return config;
@@ -32,10 +28,7 @@ axios.interceptors.request.use(
 
 // Add a response interceptor
 axios.interceptors.response.use(
-  response => {
-    console.log(`Response from ${response.config.url}: Status ${response.status}`);
-    return response;
-  },
+  response => response,
   error => {
     if (error.response) {
       // The request was made and the server responded with a status code
@@ -48,11 +41,11 @@ axios.interceptors.response.use(
     } else if (error.code === 'ECONNABORTED') {
       // The request timed out
       console.error('Timeout Error: Request took too long to complete', error.message);
-      error.response = { data: { message: 'Request timed out. Please try again later.' } };
+      error.response = { data: { message: 'Request timed out. Please try again.' } };
     } else {
       // Something happened in setting up the request that triggered an Error
-      console.error('Axios error (unknown):', error.message);
-      error.response = { data: { message: 'An unexpected error occurred.' } };
+      console.error('Error:', error.message);
+      error.response = { data: { message: 'An unexpected error occurred. Please try again.' } };
     }
     return Promise.reject(error);
   }
