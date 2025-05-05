@@ -6,7 +6,7 @@ const dotenv = require('dotenv');
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-// MongoDB connection
+// MongoDB connection chnaged
 const MONGO_URI = "mongodb+srv://deekshalaw314:hkdA7jShyPx7Dspv@deeksha-law.dl65cnb.mongodb.net/?retryWrites=true&w=majority&appName=deeksha-law";
 
 // Admin credentials
