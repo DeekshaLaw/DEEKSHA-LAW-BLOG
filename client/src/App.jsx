@@ -32,7 +32,7 @@ import Users from './pages/admin/Users';
 import UserActivity from './pages/admin/UserActivity';
 
 // Set axios defaults
-axios.defaults.baseURL = 'http://localhost:5000/api';
+axios.defaults.baseURL = 'https://deeksha-law-blog-d09x.onrender.com/api';
 
 function App() {
   return (
