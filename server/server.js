@@ -28,7 +28,6 @@ const corsOptions = {
     'https://deeksha-law-blog.onrender.com',
     'https://deekshalaw.in',
     'https://www.deekshalaw.in'
-    'deekshalaw.in'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
