@@ -50,7 +50,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Connect to MongoDB
-const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://harsharsm007:6UWJEOyssPqbuzyx@deekshalawblog.axpqkdx.mongodb.net/?retryWrites=true&w=majority&appName=DEEKSHALAWBLOG";
+const MONGO_URI = process.env.MONGODB_URI || "mongodb+srv://deekshalaw314:hkdA7jShyPx7Dspv@deeksha-law.dl65cnb.mongodb.net/?retryWrites=true&w=majority&appName=deeksha-law";
 const PORT = process.env.PORT || 5000;
 
 console.log("MongoDB URI:", MONGO_URI);

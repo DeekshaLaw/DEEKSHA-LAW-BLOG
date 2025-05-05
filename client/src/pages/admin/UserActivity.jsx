@@ -320,7 +320,7 @@ const UserActivity = () => {
                                   <div className="list-group-item" key={comment._id}>
                                     <div className="d-flex justify-content-between align-items-center">
                                       <small className="text-muted">
-                                        {new Date(comment.createdAt).toLocaleString()}
+                                        {comment.date ? new Date(comment.date).toLocaleString() : 'Date not available'}
                                       </small>
                                       <div>
                                         <Link 
@@ -341,7 +341,7 @@ const UserActivity = () => {
                                         </button>
                                       </div>
                                     </div>
-                                    <p className="mt-2 mb-0">{comment.text}</p>
+                                    <p className="mt-2 mb-0">{comment.comment}</p>
                                   </div>
                                   );
                                 })}
