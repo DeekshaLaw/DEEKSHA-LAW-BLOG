@@ -25,7 +25,7 @@ const isTokenExpired = (token) => {
 // Provider component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,26 +43,31 @@ export const AuthProvider = ({ children }) => {
 
   // Load user with token
   const loadUser = async () => {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      setUser(null);
-      setIsAuthenticated(false);
-      return;
-    }
-    
     try {
-      const decoded = jwtDecode(token);
+      const storedToken = localStorage.getItem('token');
       
-      // Use the /me endpoint for both admin and regular users
+      if (!storedToken || isTokenExpired(storedToken)) {
+        setUser(null);
+        setIsAuthenticated(false);
+        setToken(null);
+        setAuthToken(null);
+        setLoading(false);
+        return;
+      }
+      
+      setAuthToken(storedToken);
       const res = await axios.get('/users/me');
       setUser(res.data.data);
       setIsAuthenticated(true);
+      setToken(storedToken);
     } catch (err) {
       console.error('Error loading user:', err);
-      localStorage.removeItem('token');
       setUser(null);
       setIsAuthenticated(false);
+      setToken(null);
+      setAuthToken(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -250,10 +255,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Load user when token changes
+  // Initialize auth state
   useEffect(() => {
     loadUser();
-  }, [token]);
+  }, []);
 
   return (
     <AuthContext.Provider
