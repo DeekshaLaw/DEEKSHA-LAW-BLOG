@@ -54,14 +54,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const decoded = jwtDecode(token);
       
-      if (decoded.role === 'admin') {
-        const res = await axios.get('/users/admin/profile');
-        setUser(res.data.data);
-      } else {
-        const res = await axios.get('/users/profile');
-        setUser(res.data.data);
-      }
-      
+      // Use the /me endpoint for both admin and regular users
+      const res = await axios.get('/users/me');
+      setUser(res.data.data);
       setIsAuthenticated(true);
     } catch (err) {
       console.error('Error loading user:', err);
