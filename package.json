@@ -1,6 +1,14 @@
 {
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
   "dependencies": {
-    "cloudinary": "^2.6.0",
+    "cloudinary": "^1.41.3",
     "multer-storage-cloudinary": "^4.0.0"
   }
 }
